@@ -89,26 +89,38 @@ export function FlujoCajaView({
       .reduce((sum, m) => sum + Number(m.monto || 0), 0);
   }, [movimientosDelMes]);
 
-  const totalGastos = useMemo(() => {
+  // Gastos de vida (sin incluir abonos a tarjetas)
+  const gastosVida = useMemo(() => {
     return movimientosDelMes
-      .filter((m) => m.tipo === 'Gasto')
+      .filter((m) => m.tipo === 'Gasto' && m.categoria !== 'Pago de Tarjeta / Crédito')
       .reduce((sum, m) => sum + Number(m.monto || 0), 0);
   }, [movimientosDelMes]);
 
-  // Compromiso de pagos mínimos de las tarjetas activas
+  // Abonos reales realizados a tarjetas este mes (generados por la bitácora)
+  const pagosRealesTarjetas = useMemo(() => {
+    return movimientosDelMes
+      .filter((m) => m.tipo === 'Gasto' && m.categoria === 'Pago de Tarjeta / Crédito')
+      .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+  }, [movimientosDelMes]);
+
+  // Total gastado en el mes (Vida + Abonos a Tarjetas)
+  const totalGastos = gastosVida + pagosRealesTarjetas;
+
+  // Compromiso total de pagos mínimos presupuestados
   const compromisoMinimosDeuda = useMemo(() => {
     return deudasConSaldo
       .filter((d) => !d.esta_liquidada)
       .reduce((sum, d) => sum + Number(d.pago_minimo || 0), 0);
   }, [deudasConSaldo]);
 
-  // Flujo libre restante para inyectar a Bola de Nieve
-  const flujoNetoExcedente = totalIngresos - totalGastos - compromisoMinimosDeuda;
+  // Flujo libre restante para inyectar a Bola de Nieve (Ingresos - GastosVida - Mayor entre mínimos y lo ya pagado)
+  const flujoNetoExcedente =
+    totalIngresos - gastosVida - Math.max(compromisoMinimosDeuda, pagosRealesTarjetas);
 
   // Porcentajes para la barra de distribución
-  const pctGastos = totalIngresos > 0 ? Math.min(100, Math.round((totalGastos / totalIngresos) * 100)) : 0;
-  const pctMinimos = totalIngresos > 0 ? Math.min(100, Math.round((compromisoMinimosDeuda / totalIngresos) * 100)) : 0;
-  const pctExcedente = totalIngresos > 0 ? Math.max(0, 100 - pctGastos - pctMinimos) : 0;
+  const pctGastosVida = totalIngresos > 0 ? Math.min(100, Math.round((gastosVida / totalIngresos) * 100)) : 0;
+  const pctTarjetas = totalIngresos > 0 ? Math.min(100, Math.round((Math.max(compromisoMinimosDeuda, pagosRealesTarjetas) / totalIngresos) * 100)) : 0;
+  const pctExcedente = totalIngresos > 0 ? Math.max(0, 100 - pctGastosVida - pctTarjetas) : 0;
 
   // Deuda objetivo #1 actual (Foco Bola de Nieve)
   const deudaObjetivoActual = deudasConSaldo.find((d) => !d.esta_liquidada);
@@ -235,7 +247,9 @@ export function FlujoCajaView({
             {formatoMoneda(totalGastos)}
           </div>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
-            Renta, despensa, servicios ({pctGastos}% del ingreso)
+            {pagosRealesTarjetas > 0
+              ? `Vida: ${formatoMoneda(gastosVida)} • Tarjetas: ${formatoMoneda(pagosRealesTarjetas)}`
+              : `Renta, despensa, etc. (${pctGastosVida}% del ingreso)`}
           </p>
         </div>
 
@@ -252,8 +266,20 @@ export function FlujoCajaView({
           <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             {formatoMoneda(compromisoMinimosDeuda)}
           </div>
-          <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 font-semibold">
-            {deudasConSaldo.filter((d) => !d.esta_liquidada).length} tarjetas activas ({pctMinimos}% del ingreso)
+          <p className="mt-1 text-xs font-semibold">
+            {pagosRealesTarjetas >= compromisoMinimosDeuda && compromisoMinimosDeuda > 0 ? (
+              <span className="text-emerald-600 dark:text-emerald-400">
+                ✓ Mínimos cubiertos ({formatoMoneda(pagosRealesTarjetas)} pagados)
+              </span>
+            ) : pagosRealesTarjetas > 0 ? (
+              <span className="text-amber-600 dark:text-amber-400">
+                Cubierto: {formatoMoneda(pagosRealesTarjetas)} (Faltan {formatoMoneda(compromisoMinimosDeuda - pagosRealesTarjetas)})
+              </span>
+            ) : (
+              <span className="text-amber-600 dark:text-amber-400">
+                {deudasConSaldo.filter((d) => !d.esta_liquidada).length} tarjetas activas
+              </span>
+            )}
           </p>
         </div>
 
@@ -315,19 +341,19 @@ export function FlujoCajaView({
           </div>
 
           <div className="h-3 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden flex">
-            {/* Gastos */}
+            {/* Gastos de Vida */}
             <div
-              style={{ width: `${pctGastos}%` }}
+              style={{ width: `${pctGastosVida}%` }}
               className="bg-rose-500 h-full transition-all duration-500"
-              title={`Gastos: ${pctGastos}%`}
+              title={`Gastos de Vida: ${pctGastosVida}%`}
             />
-            {/* Mínimos */}
+            {/* Tarjetas y Deudas */}
             <div
-              style={{ width: `${pctMinimos}%` }}
-              className="bg-amber-500 h-full transition-all duration-500"
-              title={`Mínimos tarjetas: ${pctMinimos}%`}
+              style={{ width: `${pctTarjetas}%` }}
+              className="bg-indigo-500 h-full transition-all duration-500"
+              title={`Tarjetas y Deudas: ${pctTarjetas}%`}
             />
-            {/* Excedente */}
+            {/* Excedente Libre */}
             <div
               style={{ width: `${pctExcedente}%` }}
               className="bg-emerald-500 h-full transition-all duration-500"
@@ -339,19 +365,19 @@ export function FlujoCajaView({
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
               <span className="text-slate-600 dark:text-slate-400">
-                Gastos: <strong>{pctGastos}%</strong> ({formatoMoneda(totalGastos)})
+                Gastos de Vida: <strong>{pctGastosVida}%</strong> ({formatoMoneda(gastosVida)})
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
               <span className="text-slate-600 dark:text-slate-400">
-                Tarjetas (Mínimos): <strong>{pctMinimos}%</strong> ({formatoMoneda(compromisoMinimosDeuda)})
+                Abonos a Tarjetas: <strong>{pctTarjetas}%</strong> ({formatoMoneda(pagosRealesTarjetas)})
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
               <span className="text-slate-600 dark:text-slate-400">
-                Excedente Bola de Nieve: <strong>{pctExcedente}%</strong> ({formatoMoneda(Math.max(0, flujoNetoExcedente))})
+                Excedente Libre: <strong>{pctExcedente}%</strong> ({formatoMoneda(Math.max(0, flujoNetoExcedente))})
               </span>
             </div>
           </div>
@@ -429,6 +455,8 @@ export function FlujoCajaView({
           <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
             {movimientosFiltrados.map((mov) => {
               const esIngreso = mov.tipo === 'Ingreso';
+              const esAbonoTarjeta =
+                mov.categoria === 'Pago de Tarjeta / Crédito' || mov.id.startsWith('flujo-pago-');
 
               return (
                 <div
@@ -440,11 +468,15 @@ export function FlujoCajaView({
                       className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                         esIngreso
                           ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400'
+                          : esAbonoTarjeta
+                          ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400'
                           : 'bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400'
                       }`}
                     >
                       {esIngreso ? (
                         <ArrowUpCircle className="w-5 h-5" />
+                      ) : esAbonoTarjeta ? (
+                        <CreditCard className="w-5 h-5" />
                       ) : (
                         <ArrowDownCircle className="w-5 h-5" />
                       )}
@@ -456,14 +488,22 @@ export function FlujoCajaView({
                           {mov.descripcion}
                         </span>
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 ${
                             esIngreso
                               ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20'
+                              : esAbonoTarjeta
+                              ? 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20'
                               : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20'
                           }`}
                         >
+                          {esAbonoTarjeta && <CreditCard className="w-2.5 h-2.5" />}
                           {mov.categoria}
                         </span>
+                        {esAbonoTarjeta && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/50">
+                            Bitácora
+                          </span>
+                        )}
                         {mov.es_recurrente && (
                           <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                             <Repeat className="w-2.5 h-2.5" />
@@ -481,7 +521,11 @@ export function FlujoCajaView({
                     <div className="text-right">
                       <div
                         className={`text-sm sm:text-base font-extrabold ${
-                          esIngreso ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                          esIngreso
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : esAbonoTarjeta
+                            ? 'text-indigo-600 dark:text-indigo-400'
+                            : 'text-rose-600 dark:text-rose-400'
                         }`}
                       >
                         {esIngreso ? '+' : '-'} {formatoMoneda(mov.monto)}
@@ -489,16 +533,28 @@ export function FlujoCajaView({
                     </div>
 
                     <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => onEditMovimiento(mov)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                        title="Editar movimiento"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
+                      {esAbonoTarjeta ? (
+                        <span
+                          title="Registrado automáticamente desde la Bitácora de Pagos. Se administra desde la pestaña Pagos y Deudas."
+                          className="p-1.5 rounded-lg text-slate-300 dark:text-slate-600 cursor-not-allowed"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => onEditMovimiento(mov)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                          title="Editar movimiento"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                       <button
                         onClick={() => {
-                          if (confirm(`¿Eliminar este movimiento "${mov.descripcion}"?`)) {
+                          const msg = esAbonoTarjeta
+                            ? `Este movimiento proviene de un abono a tarjeta registrado en la Bitácora.\n\n¿Deseas eliminarlo de Flujo de Caja? (Nota: para revertir el saldo de la deuda, se recomienda eliminarlo desde la Bitácora de Pagos).`
+                            : `¿Eliminar este movimiento "${mov.descripcion}"?`;
+                          if (confirm(msg)) {
                             deleteMovimientoFlujo(mov.id);
                           }
                         }}

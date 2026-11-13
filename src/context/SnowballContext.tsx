@@ -198,15 +198,22 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       .filter((m) => m.tipo === 'Ingreso')
       .reduce((sum, m) => sum + Number(m.monto || 0), 0);
 
-    const total_gastos = movimientosDelMes
-      .filter((m) => m.tipo === 'Gasto')
+    const gastos_vida = movimientosDelMes
+      .filter((m) => m.tipo === 'Gasto' && m.categoria !== 'Pago de Tarjeta / Crédito')
       .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+
+    const pagos_reales_tarjetas = movimientosDelMes
+      .filter((m) => m.tipo === 'Gasto' && m.categoria === 'Pago de Tarjeta / Crédito')
+      .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+
+    const total_gastos = gastos_vida + pagos_reales_tarjetas;
 
     const compromiso_minimos_deuda = deudasConSaldo
       .filter((d) => !d.esta_liquidada)
       .reduce((sum, d) => sum + Number(d.pago_minimo || 0), 0);
 
-    const flujo_neto_disponible = total_ingresos - total_gastos - compromiso_minimos_deuda;
+    const flujo_neto_disponible =
+      total_ingresos - gastos_vida - Math.max(compromiso_minimos_deuda, pagos_reales_tarjetas);
 
     const tasa_ahorro_porcentaje =
       total_ingresos > 0
@@ -222,7 +229,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       flujo_neto_disponible,
       tasa_ahorro_porcentaje,
     };
-  }, [movimientosFlujo, deudasConSaldo]);
+  }, [movimientosFlujo, deudasConSaldo, currentMonth, currentYear]);
 
   // 4. Operaciones CRUD con sincronización
   const updateConfig = async (nuevaConfig: Partial<ConfiguracionUsuario>) => {
@@ -333,6 +340,25 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     };
     setBitacora((prev) => [paymentObj, ...prev]);
 
+    // Buscar nombre de la tarjeta para descripción amigable
+    const deuda = deudas.find((d) => d.id === nuevoPago.deuda_id);
+    const nombreTarjeta = deuda ? deuda.nombre_tarjeta : 'Tarjeta / Crédito';
+
+    // Reflejar inmediatamente en Flujo de Caja como Gasto
+    const flujoId = `flujo-pago-${id}`;
+    const movFlujo: MovimientoFlujo = {
+      id: flujoId,
+      tipo: 'Gasto',
+      categoria: 'Pago de Tarjeta / Crédito',
+      descripcion: `Abono a ${nombreTarjeta} (${nuevoPago.tipo_pago})`,
+      monto: Number(nuevoPago.monto_total),
+      fecha: nuevoPago.fecha_pago,
+      es_recurrente: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    setMovimientosFlujo((prev) => [movFlujo, ...prev]);
+
     if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
       try {
         await supabase.from('bitacora_pagos').insert(paymentObj);
@@ -354,6 +380,10 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
 
   const deletePago = async (pagoId: string) => {
     setBitacora((prev) => prev.filter((p) => p.id !== pagoId));
+
+    // Eliminar también el movimiento vinculado en Flujo de Caja
+    const flujoId = `flujo-pago-${pagoId}`;
+    setMovimientosFlujo((prev) => prev.filter((m) => m.id !== flujoId));
 
     if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
       try {
