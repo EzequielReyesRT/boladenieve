@@ -49,3 +49,6 @@ next-env.d.ts
 *.bat
 *.ps1
 web.config
+
+# Scripts de base de datos y seeds con datos sensibles
+*.sql
