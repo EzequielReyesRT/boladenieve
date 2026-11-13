@@ -44,3 +44,8 @@ logs/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Scripts locales de Windows e IIS
+*.bat
+*.ps1
+web.config
