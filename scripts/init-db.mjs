@@ -70,7 +70,23 @@ async function init() {
       );
     `);
 
-    // 4. Vista de saldos calculados
+    // 4. Movimientos de Flujo de Caja (Ingresos y Egresos)
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS movimientos_flujo (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        tipo VARCHAR(20) NOT NULL, -- 'Ingreso' o 'Gasto'
+        categoria VARCHAR(80) NOT NULL,
+        descripcion VARCHAR(150) NOT NULL,
+        monto NUMERIC(12, 2) NOT NULL,
+        fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+        es_recurrente BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // 5. Vista de saldos calculados
     await db.exec(`
       CREATE OR REPLACE VIEW vista_resumen_deudas AS
       SELECT 

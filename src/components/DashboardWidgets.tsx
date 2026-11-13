@@ -20,6 +20,7 @@ interface DashboardWidgetsProps {
   onOpenAddDebtModal: () => void;
   onGoToSimulator: () => void;
   onGoToDeudas?: () => void;
+  onGoToFlujo?: () => void;
 }
 
 export function DashboardWidgets({
@@ -27,6 +28,7 @@ export function DashboardWidgets({
   onOpenAddDebtModal,
   onGoToSimulator,
   onGoToDeudas,
+  onGoToFlujo,
 }: DashboardWidgetsProps) {
   const {
     deudaTotalActual,
@@ -35,6 +37,7 @@ export function DashboardWidgets({
     config,
     simulacion,
     deudasConSaldo,
+    resumenFlujoMes,
   } = useSnowball();
 
   const totalDeudasPendientes = deudasConSaldo.filter((d) => !d.esta_liquidada).length;
@@ -176,6 +179,17 @@ export function DashboardWidgets({
               {formatoMoneda(config.aportacion_unica_anual)}
             </span>
           </div>
+          {onGoToFlujo && (
+            <button
+              onClick={onGoToFlujo}
+              className="mt-2.5 w-full flex items-center justify-between text-[11px] px-2 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
+            >
+              <span>Flujo libre este mes:</span>
+              <span className="font-bold">
+                {resumenFlujoMes ? formatoMoneda(resumenFlujoMes.flujo_neto_disponible) : '$0.00'} →
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Widget 4: Meta Bola de Nieve */}

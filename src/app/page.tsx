@@ -9,10 +9,12 @@ import { DashboardWidgets } from '@/components/DashboardWidgets';
 import { DeudasView } from '@/components/DeudasView';
 import { SnowballSimulatorView } from '@/components/SnowballSimulatorView';
 import { PaymentHistoryTable } from '@/components/PaymentHistoryTable';
+import { FlujoCajaView } from '@/components/FlujoCajaView';
 import { PaymentModal } from '@/components/PaymentModal';
 import { DebtModal } from '@/components/DebtModal';
 import { ConfigModal } from '@/components/ConfigModal';
-import { DeudaConSaldoActual } from '@/types';
+import { MovimientoModal } from '@/components/MovimientoModal';
+import { DeudaConSaldoActual, MovimientoFlujo, TipoMovimiento } from '@/types';
 import {
   Menu,
   Sparkles,
@@ -20,7 +22,7 @@ import {
 } from 'lucide-react';
 
 export default function Home() {
-  const { isLoaded } = useSnowball();
+  const { isLoaded, deudasConSaldo } = useSnowball();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
   const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
@@ -29,9 +31,12 @@ export default function Home() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isDebtModalOpen, setIsDebtModalOpen] = useState(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [isMovimientoModalOpen, setIsMovimientoModalOpen] = useState(false);
 
   const [selectedDebtForPay, setSelectedDebtForPay] = useState<DeudaConSaldoActual | null>(null);
   const [debtToEdit, setDebtToEdit] = useState<DeudaConSaldoActual | null>(null);
+  const [movimientoToEdit, setMovimientoToEdit] = useState<MovimientoFlujo | null>(null);
+  const [defaultMovimientoTipo, setDefaultMovimientoTipo] = useState<TipoMovimiento>('Ingreso');
 
   const handleOpenPay = (deuda?: DeudaConSaldoActual) => {
     setSelectedDebtForPay(deuda || null);
@@ -46,6 +51,24 @@ export default function Home() {
   const handleOpenNewDebt = () => {
     setDebtToEdit(null);
     setIsDebtModalOpen(true);
+  };
+
+  const handleOpenNewMovimiento = (tipo: TipoMovimiento = 'Ingreso') => {
+    setMovimientoToEdit(null);
+    setDefaultMovimientoTipo(tipo);
+    setIsMovimientoModalOpen(true);
+  };
+
+  const handleEditMovimiento = (mov: MovimientoFlujo) => {
+    setMovimientoToEdit(mov);
+    setDefaultMovimientoTipo(mov.tipo);
+    setIsMovimientoModalOpen(true);
+  };
+
+  const handleOpenPaymentWithSurplus = () => {
+    const deudaObjetivo = deudasConSaldo.find((d) => !d.esta_liquidada) || deudasConSaldo[0];
+    setSelectedDebtForPay(deudaObjetivo || null);
+    setIsPaymentModalOpen(true);
   };
 
   if (isAuthLoading) {
@@ -140,6 +163,7 @@ export default function Home() {
                 onOpenAddDebtModal={handleOpenNewDebt}
                 onGoToSimulator={() => setCurrentTab('simulador')}
                 onGoToDeudas={() => setCurrentTab('deudas')}
+                onGoToFlujo={() => setCurrentTab('flujo')}
               />
             </div>
           )}
@@ -153,12 +177,21 @@ export default function Home() {
             />
           )}
 
-          {/* VISTA 3: SIMULADOR A 120 MESES */}
+          {/* VISTA 3: FLUJO DE CAJA (Ingresos, Gastos y Excedente) */}
+          {currentTab === 'flujo' && (
+            <FlujoCajaView
+              onOpenNewMovimiento={handleOpenNewMovimiento}
+              onEditMovimiento={handleEditMovimiento}
+              onOpenPaymentModalWithSurplus={handleOpenPaymentWithSurplus}
+            />
+          )}
+
+          {/* VISTA 4: SIMULADOR A 120 MESES */}
           {currentTab === 'simulador' && (
             <SnowballSimulatorView onOpenConfigModal={() => setIsConfigModalOpen(true)} />
           )}
 
-          {/* VISTA 4: BITÁCORA DE PAGOS */}
+          {/* VISTA 5: BITÁCORA DE PAGOS */}
           {currentTab === 'bitacora' && (
             <PaymentHistoryTable onOpenPaymentModal={() => handleOpenPay()} />
           )}
@@ -197,6 +230,13 @@ export default function Home() {
       <ConfigModal
         isOpen={isConfigModalOpen}
         onClose={() => setIsConfigModalOpen(false)}
+      />
+
+      <MovimientoModal
+        isOpen={isMovimientoModalOpen}
+        onClose={() => setIsMovimientoModalOpen(false)}
+        movimientoToEdit={movimientoToEdit}
+        defaultTipo={defaultMovimientoTipo}
       />
     </div>
   );

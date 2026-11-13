@@ -1,5 +1,30 @@
 export type TipoPago = 'Minimo' | 'Extra' | 'Anualidad' | 'Liquidacion';
 
+export type TipoMovimiento = 'Ingreso' | 'Gasto';
+
+export interface MovimientoFlujo {
+  id: string;
+  user_id?: string;
+  tipo: TipoMovimiento;
+  categoria: string;
+  descripcion: string;
+  monto: number;
+  fecha: string; // YYYY-MM-DD
+  es_recurrente: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ResumenFlujoMes {
+  mes_calendario: number;
+  anio: number;
+  total_ingresos: number;
+  total_gastos: number;
+  compromiso_minimos_deuda: number;
+  flujo_neto_disponible: number;
+  tasa_ahorro_porcentaje: number;
+}
+
 export interface Usuario {
   id: string;
   nombre: string;

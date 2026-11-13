@@ -7,6 +7,8 @@ import {
   ConfiguracionUsuario,
   DeudaConSaldoActual,
   ResultadoSimulacion,
+  MovimientoFlujo,
+  ResumenFlujoMes,
 } from '@/types';
 import {
   CONFIG_INICIAL,
@@ -32,6 +34,9 @@ interface SnowballContextType {
   deudaTotalOriginal: number;
   porcentajeAvanceGlobal: number;
   pagoTotalMensualBase: number;
+  // Flujo de Caja
+  movimientosFlujo: MovimientoFlujo[];
+  resumenFlujoMes: ResumenFlujoMes;
   // Acciones
   updateConfig: (nuevaConfig: Partial<ConfiguracionUsuario>) => Promise<void>;
   addDeuda: (nuevaDeuda: Omit<Deuda, 'id' | 'created_at'>) => Promise<void>;
@@ -39,6 +44,9 @@ interface SnowballContextType {
   deleteDeuda: (deudaId: string) => Promise<void>;
   addPago: (nuevoPago: Omit<BitacoraPago, 'id' | 'created_at'>) => Promise<void>;
   deletePago: (pagoId: string) => Promise<void>;
+  addMovimientoFlujo: (nuevoMov: Omit<MovimientoFlujo, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateMovimientoFlujo: (movActualizado: MovimientoFlujo) => Promise<void>;
+  deleteMovimientoFlujo: (id: string) => Promise<void>;
   resetToDemo: () => void;
 }
 
@@ -54,6 +62,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
   const [config, setConfig] = useState<ConfiguracionUsuario>(CONFIG_INICIAL);
   const [deudas, setDeudas] = useState<Deuda[]>(DEUDAS_INICIALES);
   const [bitacora, setBitacora] = useState<BitacoraPago[]>(BITACORA_INICIAL);
+  const [movimientosFlujo, setMovimientosFlujo] = useState<MovimientoFlujo[]>([]);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [connectionType, setConnectionType] = useState<'supabase' | 'local_postgres' | 'local_storage'>('local_postgres');
 
@@ -82,20 +91,23 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
 
       // Prioridad 2: Base de datos PostgreSQL local via API de desarrollo
       try {
-        const [resCfg, resDeudas, resBitacora] = await Promise.all([
+        const [resCfg, resDeudas, resBitacora, resFlujo] = await Promise.all([
           fetch('/api/config'),
           fetch('/api/deudas'),
           fetch('/api/pagos'),
+          fetch('/api/flujo'),
         ]);
 
         if (resCfg.ok && resDeudas.ok && resBitacora.ok) {
           const dataCfg = await resCfg.json();
           const dataDeudas = await resDeudas.json();
           const dataBitacora = await resBitacora.json();
+          const dataFlujo = resFlujo.ok ? await resFlujo.json() : [];
 
           if (dataCfg) setConfig(dataCfg);
           if (Array.isArray(dataDeudas)) setDeudas(dataDeudas);
           if (Array.isArray(dataBitacora)) setBitacora(dataBitacora);
+          if (Array.isArray(dataFlujo)) setMovimientosFlujo(dataFlujo);
 
           setConnectionType('local_postgres');
           setIsLoaded(true);
@@ -159,6 +171,58 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       .reduce((sum, d) => sum + d.pago_minimo, 0);
     return sumaMinimosActivos + Number(config.pago_extra_mensual || 0);
   }, [deudasConSaldo, config.pago_extra_mensual]);
+
+  const [currentMonth, setCurrentMonth] = useState<number>(11);
+  const [currentYear, setCurrentYear] = useState<number>(2026);
+
+  useEffect(() => {
+    const d = new Date();
+    setCurrentMonth(d.getMonth() + 1);
+    setCurrentYear(d.getFullYear());
+  }, []);
+
+  const resumenFlujoMes = useMemo<ResumenFlujoMes>(() => {
+    const mesActual = currentMonth;
+    const anioActual = currentYear;
+
+    const movimientosDelMes = movimientosFlujo.filter((m) => {
+      if (!m.fecha) return false;
+      const partes = m.fecha.split('-');
+      if (partes.length < 2) return false;
+      const anio = parseInt(partes[0], 10);
+      const mes = parseInt(partes[1], 10);
+      return anio === anioActual && mes === mesActual;
+    });
+
+    const total_ingresos = movimientosDelMes
+      .filter((m) => m.tipo === 'Ingreso')
+      .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+
+    const total_gastos = movimientosDelMes
+      .filter((m) => m.tipo === 'Gasto')
+      .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+
+    const compromiso_minimos_deuda = deudasConSaldo
+      .filter((d) => !d.esta_liquidada)
+      .reduce((sum, d) => sum + Number(d.pago_minimo || 0), 0);
+
+    const flujo_neto_disponible = total_ingresos - total_gastos - compromiso_minimos_deuda;
+
+    const tasa_ahorro_porcentaje =
+      total_ingresos > 0
+        ? Math.max(0, Math.round((flujo_neto_disponible / total_ingresos) * 100))
+        : 0;
+
+    return {
+      mes_calendario: mesActual,
+      anio: anioActual,
+      total_ingresos,
+      total_gastos,
+      compromiso_minimos_deuda,
+      flujo_neto_disponible,
+      tasa_ahorro_porcentaje,
+    };
+  }, [movimientosFlujo, deudasConSaldo]);
 
   // 4. Operaciones CRUD con sincronización
   const updateConfig = async (nuevaConfig: Partial<ConfiguracionUsuario>) => {
@@ -308,6 +372,55 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const addMovimientoFlujo = async (nuevoMov: Omit<MovimientoFlujo, 'id' | 'created_at' | 'updated_at'>) => {
+    const id = `flujo-${Date.now()}`;
+    const movObj: MovimientoFlujo = {
+      ...nuevoMov,
+      id,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    setMovimientosFlujo((prev) => [movObj, ...prev]);
+
+    try {
+      await fetch('/api/flujo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(movObj),
+      });
+    } catch (e) {
+      console.error('Error al registrar movimiento en base local:', e);
+    }
+  };
+
+  const updateMovimientoFlujo = async (movActualizado: MovimientoFlujo) => {
+    setMovimientosFlujo((prev) =>
+      prev.map((m) => (m.id === movActualizado.id ? movActualizado : m))
+    );
+
+    try {
+      await fetch('/api/flujo', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(movActualizado),
+      });
+    } catch (e) {
+      console.error('Error al actualizar movimiento en base local:', e);
+    }
+  };
+
+  const deleteMovimientoFlujo = async (id: string) => {
+    setMovimientosFlujo((prev) => prev.filter((m) => m.id !== id));
+
+    try {
+      await fetch(`/api/flujo?id=${id}`, {
+        method: 'DELETE',
+      });
+    } catch (e) {
+      console.error('Error al eliminar movimiento en base local:', e);
+    }
+  };
+
   const resetToDemo = () => {
     setConfig(CONFIG_INICIAL);
     setDeudas(DEUDAS_INICIALES);
@@ -333,12 +446,17 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
         deudaTotalOriginal,
         porcentajeAvanceGlobal,
         pagoTotalMensualBase,
+        movimientosFlujo,
+        resumenFlujoMes,
         updateConfig,
         addDeuda,
         updateDeuda,
         deleteDeuda,
         addPago,
         deletePago,
+        addMovimientoFlujo,
+        updateMovimientoFlujo,
+        deleteMovimientoFlujo,
         resetToDemo,
       }}
     >

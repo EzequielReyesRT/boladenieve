@@ -19,9 +19,10 @@ import {
   RotateCcw,
   X,
   LogOut,
+  Wallet,
 } from 'lucide-react';
 
-export type NavTab = 'dashboard' | 'deudas' | 'simulador' | 'bitacora';
+export type NavTab = 'dashboard' | 'deudas' | 'flujo' | 'simulador' | 'bitacora';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -67,6 +68,13 @@ export function Sidebar({
       icon: CreditCard,
       badge: deudasPendientes > 0 ? deudasPendientes : null,
       desc: 'Gestión y orden bola de nieve',
+    },
+    {
+      id: 'flujo' as NavTab,
+      label: 'Flujo de Caja',
+      icon: Wallet,
+      badge: null,
+      desc: 'Ingresos, gastos y excedente',
     },
     {
       id: 'simulador' as NavTab,
