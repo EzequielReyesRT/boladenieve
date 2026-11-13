@@ -72,15 +72,17 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       // Prioridad 1: Supabase si están las credenciales
       if (isSupabaseConfigured && supabase) {
         try {
-          const [cfgRes, deudasRes, bitacoraRes] = await Promise.all([
-            supabase.from('configuracion_usuario').select('*').limit(1).single(),
+          const [cfgRes, deudasRes, bitacoraRes, flujoRes] = await Promise.all([
+            supabase.from('configuracion_usuario').select('*').limit(1).maybeSingle(),
             supabase.from('deudas').select('*').order('saldo_inicial', { ascending: true }),
             supabase.from('bitacora_pagos').select('*').order('fecha_pago', { ascending: false }),
+            supabase.from('movimientos_flujo').select('*').order('fecha', { ascending: false }),
           ]);
 
           if (cfgRes.data) setConfig(cfgRes.data);
           if (Array.isArray(deudasRes.data)) setDeudas(deudasRes.data);
           if (Array.isArray(bitacoraRes.data)) setBitacora(bitacoraRes.data);
+          if (Array.isArray(flujoRes.data)) setMovimientosFlujo(flujoRes.data);
           setConnectionType('supabase');
           setIsLoaded(true);
           return;
@@ -362,6 +364,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
       try {
         await supabase.from('bitacora_pagos').insert(paymentObj);
+        await supabase.from('movimientos_flujo').insert(movFlujo);
       } catch (e) {
         console.error('Error al registrar pago en Supabase:', e);
       }
@@ -388,6 +391,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
       try {
         await supabase.from('bitacora_pagos').delete().eq('id', pagoId);
+        await supabase.from('movimientos_flujo').delete().eq('id', flujoId);
       } catch (e) {
         console.error('Error al eliminar pago en Supabase:', e);
       }
@@ -412,14 +416,22 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     };
     setMovimientosFlujo((prev) => [movObj, ...prev]);
 
-    try {
-      await fetch('/api/flujo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(movObj),
-      });
-    } catch (e) {
-      console.error('Error al registrar movimiento en base local:', e);
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('movimientos_flujo').insert(movObj);
+      } catch (e) {
+        console.error('Error al registrar movimiento en Supabase:', e);
+      }
+    } else {
+      try {
+        await fetch('/api/flujo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(movObj),
+        });
+      } catch (e) {
+        console.error('Error al registrar movimiento en base local:', e);
+      }
     }
   };
 
@@ -428,26 +440,45 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       prev.map((m) => (m.id === movActualizado.id ? movActualizado : m))
     );
 
-    try {
-      await fetch('/api/flujo', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(movActualizado),
-      });
-    } catch (e) {
-      console.error('Error al actualizar movimiento en base local:', e);
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+      try {
+        await supabase
+          .from('movimientos_flujo')
+          .update(movActualizado)
+          .eq('id', movActualizado.id);
+      } catch (e) {
+        console.error('Error al actualizar movimiento en Supabase:', e);
+      }
+    } else {
+      try {
+        await fetch('/api/flujo', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(movActualizado),
+        });
+      } catch (e) {
+        console.error('Error al actualizar movimiento en base local:', e);
+      }
     }
   };
 
   const deleteMovimientoFlujo = async (id: string) => {
     setMovimientosFlujo((prev) => prev.filter((m) => m.id !== id));
 
-    try {
-      await fetch(`/api/flujo?id=${id}`, {
-        method: 'DELETE',
-      });
-    } catch (e) {
-      console.error('Error al eliminar movimiento en base local:', e);
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('movimientos_flujo').delete().eq('id', id);
+      } catch (e) {
+        console.error('Error al eliminar movimiento en Supabase:', e);
+      }
+    } else {
+      try {
+        await fetch(`/api/flujo?id=${id}`, {
+          method: 'DELETE',
+        });
+      } catch (e) {
+        console.error('Error al eliminar movimiento en base local:', e);
+      }
     }
   };
 
