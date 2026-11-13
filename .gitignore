@@ -1,0 +1,30 @@
+# Dependencias (se instalan solas en Vercel)
+/node_modules
+/.pnp
+.pnp.*
+
+# Compilacion y cache de Next.js
+/.next/
+/out/
+/build
+
+# Base de datos local y temporales
+dev-db/
+logs/
+*.log
+
+# Variables de entorno locales
+.env*.local
+.env
+!.env.example
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
