@@ -95,127 +95,129 @@ function DebtForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-4">
-      <div>
-        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-          Nombre de la Tarjeta o Crédito
-        </label>
-        <input
-          type="text"
-          placeholder="Ej. BBVA Azul, Liverpool, Préstamo Banamex"
-          value={nombreTarjeta}
-          onChange={(e) => setNombreTarjeta(e.target.value)}
-          required
-          className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
         <div>
           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-            Saldo Inicial ($)
+            Nombre de la Tarjeta o Crédito
+          </label>
+          <input
+            type="text"
+            placeholder="Ej. BBVA Azul, Liverpool, Préstamo Banamex"
+            value={nombreTarjeta}
+            onChange={(e) => setNombreTarjeta(e.target.value)}
+            required
+            className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Saldo Inicial ($)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                placeholder="0.00"
+                value={saldoInicial}
+                onChange={(e) => setSaldoInicial(e.target.value)}
+                required
+                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Tasa Anual de Interés (%)
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                max="150"
+                placeholder="Ej. 45.0"
+                value={tasaAnual}
+                onChange={(e) => setTasaAnual(e.target.value)}
+                required
+                className="w-full pl-3.5 pr-8 py-2.5 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              <span className="absolute right-3.5 top-2.5 text-slate-400 font-bold text-sm">%</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            Pago Mínimo Requerido Mensual ($)
           </label>
           <div className="relative">
             <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
             <input
               type="number"
               step="0.01"
-              min="0.01"
+              min="0"
               placeholder="0.00"
-              value={saldoInicial}
-              onChange={(e) => setSaldoInicial(e.target.value)}
+              value={pagoMinimo}
+              onChange={(e) => setPagoMinimo(e.target.value)}
               required
               className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
+          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+            Al liquidarse la deuda, este monto se liberará y alimentará a la siguiente tarjeta.
+          </p>
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-            Tasa Anual de Interés (%)
-          </label>
-          <div className="relative">
-            <input
-              type="number"
-              step="0.1"
-              min="0"
-              max="150"
-              placeholder="Ej. 45.0"
-              value={tasaAnual}
-              onChange={(e) => setTasaAnual(e.target.value)}
-              required
-              className="w-full pl-3.5 pr-8 py-2.5 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <span className="absolute right-3.5 top-2.5 text-slate-400 font-bold text-sm">%</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Costo de Anualidad ($)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                value={costoAnualidad}
+                onChange={(e) => setCostoAnualidad(e.target.value)}
+                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Mes Cobro de Anualidad
+            </label>
+            <select
+              value={mesAnualidad}
+              onChange={(e) => setMesAnualidad(parseInt(e.target.value, 10))}
+              className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {MESES.map((m) => (
+                <option key={m.val} value={m.val}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
 
-      <div>
-        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-          Pago Mínimo Requerido Mensual ($)
-        </label>
-        <div className="relative">
-          <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="0.00"
-            value={pagoMinimo}
-            onChange={(e) => setPagoMinimo(e.target.value)}
-            required
-            className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-        <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
-          Al liquidarse la deuda, este monto se liberará y alimentará a la siguiente tarjeta.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-            Costo de Anualidad ($)
-          </label>
-          <div className="relative">
-            <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              value={costoAnualidad}
-              onChange={(e) => setCostoAnualidad(e.target.value)}
-              className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-            Mes Cobro de Anualidad
-          </label>
-          <select
-            value={mesAnualidad}
-            onChange={(e) => setMesAnualidad(parseInt(e.target.value, 10))}
-            className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            {MESES.map((m) => (
-              <option key={m.val} value={m.val}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Botones */}
-      <div className="pt-2 flex items-center justify-end gap-2.5">
+      {/* Footer fijo abajo con botones siempre visibles */}
+      <div className="px-4 py-3 sm:px-6 sm:py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm flex items-center justify-end gap-2.5 shrink-0">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
         >
           Cancelar
         </button>
@@ -240,25 +242,33 @@ export function DebtModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="relative w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col max-h-[90dvh] sm:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-200">
+        <div className="flex items-center justify-between px-5 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 z-10">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
               <CreditCard className="w-5 h-5" />
             </div>
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
                 {debtToEdit ? 'Editar Deuda / Tarjeta' : 'Agregar Nueva Deuda'}
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
                 Se ordenará automáticamente por menor saldo en la Bola de Nieve
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 -mr-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            title="Cerrar ventana"
+            aria-label="Cerrar ventana"
           >
             <X className="w-5 h-5" />
           </button>

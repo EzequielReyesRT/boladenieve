@@ -126,201 +126,204 @@ function PaymentForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-4">
-      {/* Tarjeta destino */}
-      <div>
-        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-          Tarjeta / Deuda Destino
-        </label>
-        <div className="relative">
-          <select
-            value={deudaId}
-            onChange={(e) => handleDeudaChange(e.target.value)}
-            required
-            className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
-          >
-            {deudasConSaldo.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.nombre_tarjeta} — Saldo: {formatoMoneda(d.saldo_actual)} | Pago Mín: {formatoMoneda(d.pago_minimo)}{' '}
-                {d.esta_liquidada ? '(Liquidada)' : ''}
-              </option>
-            ))}
-          </select>
-        </div>
-        {deudaSeleccionada && (
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 flex-wrap">
-            <span>Saldo pendiente:</span>
-            <span className="font-semibold text-rose-500">{formatoMoneda(deudaSeleccionada.saldo_actual)}</span>
-            <span>•</span>
-            <span>Pago mín guardado:</span>
-            <span className="font-semibold text-emerald-600 dark:text-emerald-400">{formatoMoneda(deudaSeleccionada.pago_minimo)}</span>
-            {deudaSeleccionada.costo_anualidad > 0 && (
-              <>
-                <span>•</span>
-                <span>Anualidad:</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">{formatoMoneda(deudaSeleccionada.costo_anualidad)}</span>
-              </>
-            )}
-          </p>
-        )}
-      </div>
-
-      {/* Fecha y Tipo de Pago */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      {/* Contenido scrolleable para celulares y pantallas pequeñas */}
+      <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
+        {/* Tarjeta destino */}
         <div>
           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-            Fecha de Pago
+            Tarjeta / Deuda Destino
+          </label>
+          <div className="relative">
+            <select
+              value={deudaId}
+              onChange={(e) => handleDeudaChange(e.target.value)}
+              required
+              className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
+            >
+              {deudasConSaldo.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.nombre_tarjeta} — Saldo: {formatoMoneda(d.saldo_actual)} | Pago Mín: {formatoMoneda(d.pago_minimo)}{' '}
+                  {d.esta_liquidada ? '(Liquidada)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+          {deudaSeleccionada && (
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 flex-wrap">
+              <span>Saldo pendiente:</span>
+              <span className="font-semibold text-rose-500">{formatoMoneda(deudaSeleccionada.saldo_actual)}</span>
+              <span>•</span>
+              <span>Pago mín guardado:</span>
+              <span className="font-semibold text-emerald-600 dark:text-emerald-400">{formatoMoneda(deudaSeleccionada.pago_minimo)}</span>
+              {deudaSeleccionada.costo_anualidad > 0 && (
+                <>
+                  <span>•</span>
+                  <span>Anualidad:</span>
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">{formatoMoneda(deudaSeleccionada.costo_anualidad)}</span>
+                </>
+              )}
+            </p>
+          )}
+        </div>
+
+        {/* Fecha y Tipo de Pago */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Fecha de Pago
+            </label>
+            <input
+              type="date"
+              value={fechaPago}
+              onChange={(e) => setFechaPago(e.target.value)}
+              required
+              className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Tipo de Pago
+            </label>
+            <select
+              value={tipoPago}
+              onChange={(e) => handleTipoPagoChange(e.target.value as TipoPago)}
+              className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
+            >
+              {TIPOS_PAGO.map((tp) => (
+                <option key={tp.value} value={tp.value}>
+                  {tp.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Montos */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Monto Total Pagado ($)
+              </label>
+              {tipoPago === 'Minimo' && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                  <Sparkles className="w-2.5 h-2.5" />
+                  Auto-mínimo
+                </span>
+              )}
+            </div>
+            <div className="relative">
+              <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                placeholder="0.00"
+                value={montoTotal}
+                onChange={(e) => setMontoTotal(e.target.value)}
+                required
+                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            {/* Accesos rápidos de monto */}
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {deudaSeleccionada && deudaSeleccionada.pago_minimo > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleTipoPagoChange('Minimo')}
+                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                    tipoPago === 'Minimo' && montoTotal === deudaSeleccionada.pago_minimo.toString()
+                      ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-bold'
+                      : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Cargar pago mínimo guardado"
+                >
+                  Pago Mínimo: {formatoMoneda(deudaSeleccionada.pago_minimo)}
+                </button>
+              )}
+              {deudaSeleccionada && deudaSeleccionada.saldo_actual > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleTipoPagoChange('Liquidacion')}
+                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium transition-colors ${
+                    tipoPago === 'Liquidacion' && montoTotal === deudaSeleccionada.saldo_actual.toString()
+                      ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-600 dark:text-cyan-400 font-bold'
+                      : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Cargar saldo restante total"
+                >
+                  Liquidar: {formatoMoneda(deudaSeleccionada.saldo_actual)}
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Intereses Cobrados ($)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                value={interesesCobrados}
+                onChange={(e) => setInteresesCobrados(e.target.value)}
+                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+            <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+              Se descuenta del pago para calcular la amortización a capital.
+            </p>
+          </div>
+        </div>
+
+        {/* Aviso de confirmación de autocompletado */}
+        {tipoPago === 'Minimo' && deudaSeleccionada && deudaSeleccionada.pago_minimo > 0 && (
+          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+            <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+            <span>
+              Monto llenado con el pago mínimo guardado de <strong>{deudaSeleccionada.nombre_tarjeta}</strong> ({formatoMoneda(deudaSeleccionada.pago_minimo)}).
+            </span>
+          </div>
+        )}
+
+        {/* Amortización Desglose */}
+        <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 text-xs flex items-center justify-between">
+          <span className="font-semibold text-emerald-800 dark:text-emerald-300">
+            Amortización directa a capital:
+          </span>
+          <span className="font-extrabold text-sm text-emerald-600 dark:text-emerald-400">
+            {formatoMoneda(amortizacionCapital)}
+          </span>
+        </div>
+
+        {/* Folio */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            Folio de Comprobante / Referencia (Opcional)
           </label>
           <input
-            type="date"
-            value={fechaPago}
-            onChange={(e) => setFechaPago(e.target.value)}
-            required
+            type="text"
+            placeholder="Ej. SPEI-984021 o Núm de autorización"
+            value={folioComprobante}
+            onChange={(e) => setFolioComprobante(e.target.value)}
             className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-            Tipo de Pago
-          </label>
-          <select
-            value={tipoPago}
-            onChange={(e) => handleTipoPagoChange(e.target.value as TipoPago)}
-            className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
-          >
-            {TIPOS_PAGO.map((tp) => (
-              <option key={tp.value} value={tp.value}>
-                {tp.label}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
-      {/* Montos */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Monto Total Pagado ($)
-            </label>
-            {tipoPago === 'Minimo' && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-                <Sparkles className="w-2.5 h-2.5" />
-                Auto-mínimo
-              </span>
-            )}
-          </div>
-          <div className="relative">
-            <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
-            <input
-              type="number"
-              step="0.01"
-              min="0.01"
-              placeholder="0.00"
-              value={montoTotal}
-              onChange={(e) => setMontoTotal(e.target.value)}
-              required
-              className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-          </div>
-
-          {/* Accesos rápidos de monto */}
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {deudaSeleccionada && deudaSeleccionada.pago_minimo > 0 && (
-              <button
-                type="button"
-                onClick={() => handleTipoPagoChange('Minimo')}
-                className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-                  tipoPago === 'Minimo' && montoTotal === deudaSeleccionada.pago_minimo.toString()
-                    ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-bold'
-                    : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-                title="Cargar pago mínimo guardado"
-              >
-                Pago Mínimo: {formatoMoneda(deudaSeleccionada.pago_minimo)}
-              </button>
-            )}
-            {deudaSeleccionada && deudaSeleccionada.saldo_actual > 0 && (
-              <button
-                type="button"
-                onClick={() => handleTipoPagoChange('Liquidacion')}
-                className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium transition-colors ${
-                  tipoPago === 'Liquidacion' && montoTotal === deudaSeleccionada.saldo_actual.toString()
-                    ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-600 dark:text-cyan-400 font-bold'
-                    : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-                title="Cargar saldo restante total"
-              >
-                Liquidar: {formatoMoneda(deudaSeleccionada.saldo_actual)}
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-            Intereses Cobrados ($)
-          </label>
-          <div className="relative">
-            <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              value={interesesCobrados}
-              onChange={(e) => setInteresesCobrados(e.target.value)}
-              className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-          </div>
-          <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-            Se descuenta del pago para calcular la amortización a capital.
-          </p>
-        </div>
-      </div>
-
-      {/* Aviso de confirmación de autocompletado */}
-      {tipoPago === 'Minimo' && deudaSeleccionada && deudaSeleccionada.pago_minimo > 0 && (
-        <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
-          <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span>
-            Monto llenado con el pago mínimo guardado de <strong>{deudaSeleccionada.nombre_tarjeta}</strong> ({formatoMoneda(deudaSeleccionada.pago_minimo)}).
-          </span>
-        </div>
-      )}
-
-      {/* Amortización Desglose */}
-      <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 text-xs flex items-center justify-between">
-        <span className="font-semibold text-emerald-800 dark:text-emerald-300">
-          Amortización directa a capital:
-        </span>
-        <span className="font-extrabold text-sm text-emerald-600 dark:text-emerald-400">
-          {formatoMoneda(amortizacionCapital)}
-        </span>
-      </div>
-
-      {/* Folio */}
-      <div>
-        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-          Folio de Comprobante / Referencia (Opcional)
-        </label>
-        <input
-          type="text"
-          placeholder="Ej. SPEI-984021 o Núm de autorización"
-          value={folioComprobante}
-          onChange={(e) => setFolioComprobante(e.target.value)}
-          className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-        />
-      </div>
-
-      {/* Botones */}
-      <div className="pt-2 flex items-center justify-end gap-2.5">
+      {/* Footer fijo con botones siempre visibles en celular y escritorio */}
+      <div className="px-4 py-3 sm:px-6 sm:py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm flex items-center justify-end gap-2.5 shrink-0">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
         >
           Cancelar
         </button>
@@ -345,25 +348,34 @@ export function PaymentModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="relative w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col max-h-[90dvh] sm:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-200">
+        {/* Header fijo siempre visible arriba con botón de cerrar */}
+        <div className="flex items-center justify-between px-5 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 z-10">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <PlusCircle className="w-5 h-5" />
             </div>
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
                 Registrar Pago en Bitácora
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
                 Afecta directamente el saldo actual y la proyección
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 -mr-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            title="Cerrar ventana"
+            aria-label="Cerrar ventana"
           >
             <X className="w-5 h-5" />
           </button>
