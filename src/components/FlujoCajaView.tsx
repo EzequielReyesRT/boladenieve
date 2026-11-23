@@ -20,6 +20,8 @@ import {
   ArrowRight,
   Repeat,
   Scale,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
 
@@ -66,6 +68,24 @@ export function FlujoCajaView({
     setMesSeleccionado(hoy.getMonth() + 1);
     setAnioSeleccionado(hoy.getFullYear());
   }, []);
+
+  const handlePrevMonth = () => {
+    if (mesSeleccionado === 1) {
+      setMesSeleccionado(12);
+      setAnioSeleccionado((prev) => prev - 1);
+    } else {
+      setMesSeleccionado((prev) => prev - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (mesSeleccionado === 12) {
+      setMesSeleccionado(1);
+      setAnioSeleccionado((prev) => prev + 1);
+    } else {
+      setMesSeleccionado((prev) => prev + 1);
+    }
+  };
 
   const [filtroTipo, setFiltroTipo] = useState<'Todos' | 'Ingreso' | 'Gasto'>('Todos');
   const [busqueda, setBusqueda] = useState<string>('');
@@ -139,17 +159,18 @@ export function FlujoCajaView({
   return (
     <div className="space-y-6">
       {/* 1. Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-slate-900 dark:bg-[var(--surface-card)] border border-slate-800 dark:border-[var(--border-subtle)] p-6 sm:p-8 shadow-xs">
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-6 sm:p-8 shadow-xs text-[var(--text-primary)]">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[var(--brand-surface)] blur-3xl opacity-60" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--brand-surface)] border border-[var(--brand-border)] text-[var(--brand-text)] text-xs font-bold tracking-wide uppercase mb-3">
               <Scale className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
               <span>Presupuesto y Flujo de Caja</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white dark:text-[var(--text-primary)] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
               Ingresos, Gastos y Excedente
             </h1>
-            <p className="text-sm text-slate-300 dark:text-[var(--text-secondary)] max-w-2xl mt-1 leading-relaxed">
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl mt-1 leading-relaxed">
               Tu flujo de caja determina cuánto dinero libre tienes cada mes para acelerar la liquidación de tus tarjetas en cascada.
             </p>
           </div>
@@ -157,7 +178,7 @@ export function FlujoCajaView({
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => onOpenNewMovimiento('Ingreso')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--status-success)] hover:bg-[var(--status-success-hover)] text-white text-xs font-bold shadow-xs active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--status-success)] focus-visible:ring-offset-2"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--status-success)] hover:bg-[var(--status-success-hover)] text-white text-xs font-bold shadow-xs active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--status-success)] focus-visible:ring-offset-2 cursor-pointer"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Registrar Ingreso</span>
@@ -165,7 +186,7 @@ export function FlujoCajaView({
 
             <button
               onClick={() => onOpenNewMovimiento('Gasto')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-xs active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-xs active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 cursor-pointer"
             >
               <MinusCircle className="w-4 h-4" />
               <span>Registrar Gasto</span>
@@ -176,15 +197,26 @@ export function FlujoCajaView({
 
       {/* 2. Selector de Período (Mes y Año) */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs">
-        <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-[var(--brand-primary)]" />
-          <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-            Período:
-          </span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 mr-2">
+            <Calendar className="w-4 h-4 text-[var(--brand-primary)]" />
+            <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
+              Período:
+            </span>
+          </div>
+
+          <button
+            onClick={handlePrevMonth}
+            aria-label="Mes anterior"
+            className="p-1.5 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] border border-[var(--border-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95 transition-all cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
           <select
             value={mesSeleccionado}
             onChange={(e) => setMesSeleccionado(parseInt(e.target.value, 10))}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
+            className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] cursor-pointer"
           >
             {NOMBRES_MESES.map((nombre, idx) => (
               <option key={idx + 1} value={idx + 1}>
@@ -192,22 +224,31 @@ export function FlujoCajaView({
               </option>
             ))}
           </select>
+
           <select
             value={anioSeleccionado}
             onChange={(e) => setAnioSeleccionado(parseInt(e.target.value, 10))}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
+            className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] cursor-pointer"
           >
-            {[2025, 2026, 2027, 2028].map((y) => (
+            {[2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
               <option key={y} value={y}>
                 {y}
               </option>
             ))}
           </select>
+
+          <button
+            onClick={handleNextMonth}
+            aria-label="Mes siguiente"
+            className="p-1.5 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] border border-[var(--border-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95 transition-all cursor-pointer"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
 
         <div className="text-xs text-[var(--text-muted)]">
           <span>Movimientos registrados en {NOMBRES_MESES[mesSeleccionado - 1]}: </span>
-          <strong className="text-[var(--text-primary)] tabular-nums">{movimientosDelMes.length}</strong>
+          <strong className="text-[var(--text-primary)] tabular-nums font-bold">{movimientosDelMes.length}</strong>
         </div>
       </div>
 
@@ -406,13 +447,13 @@ export function FlujoCajaView({
               <button
                 key={tipo}
                 onClick={() => setFiltroTipo(tipo)}
-                className={`flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] ${
+                className={`flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] cursor-pointer ${
                   filtroTipo === tipo
                     ? tipo === 'Ingreso'
-                      ? 'bg-[var(--brand-primary)] text-white shadow-xs'
+                      ? 'bg-[var(--status-success)] text-white shadow-xs'
                       : tipo === 'Gasto'
                       ? 'bg-rose-600 text-white shadow-xs'
-                      : 'bg-slate-900 dark:bg-slate-800 text-white shadow-xs'
+                      : 'bg-[var(--brand-primary)] text-white shadow-xs'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]'
                 }`}
               >

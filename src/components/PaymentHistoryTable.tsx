@@ -120,10 +120,10 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
           {/* Botón registrar */}
           <button
             onClick={onOpenPaymentModal}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-hover)] text-white shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-95 cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
-            Nuevo Abono
+            <span>Nuevo Abono</span>
           </button>
         </div>
       </div>
@@ -185,10 +185,10 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
               ) : (
                 <button
                   onClick={onOpenPaymentModal}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-95"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-hover)] text-white shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-95 cursor-pointer"
                 >
                   <PlusCircle className="w-4 h-4" />
-                  Registrar Primer Abono
+                  <span>Registrar Primer Abono</span>
                 </button>
               )}
             </div>

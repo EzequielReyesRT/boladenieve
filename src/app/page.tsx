@@ -122,17 +122,17 @@ export default function Home() {
       />
 
       {/* 2. Barra Superior para Dispositivos Móviles (oculta en desktop lg:) */}
-      <div className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 h-16 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+      <div className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 h-16 bg-[var(--surface-card)]/90 backdrop-blur-md border-b border-[var(--border-subtle)]">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsOpenMobile(true)}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900"
-            aria-label="Abrir menú"
+            className="p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] transition-all cursor-pointer"
+            aria-label="Abrir menú de navegación"
           >
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[var(--brand-primary)] flex items-center justify-center text-white font-bold">
+            <div className="w-8 h-8 rounded-xl bg-[var(--brand-primary)] flex items-center justify-center text-white font-bold shadow-xs">
               <Sparkles className="w-4 h-4" />
             </div>
             <span className="font-extrabold text-base tracking-tight text-[var(--text-primary)]">
@@ -143,7 +143,7 @@ export default function Home() {
 
         <button
           onClick={() => handleOpenPay()}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-hover)] text-white shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95 cursor-pointer"
         >
           <PlusCircle className="w-3.5 h-3.5" />
           <span>Abonar</span>
@@ -196,17 +196,17 @@ export default function Home() {
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-slate-200 dark:border-slate-800/80 bg-white/40 dark:bg-slate-950/40 py-5 text-center text-xs text-slate-500 dark:text-slate-400">
+        <footer className="border-t border-[var(--border-subtle)] bg-[var(--surface-card)]/40 py-5 text-center text-xs text-[var(--text-muted)]">
           <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-700 dark:text-slate-300">
+              <span className="font-bold text-[var(--text-secondary)]">
                 Método de la Bola de Nieve
               </span>
               <span>•</span>
-              <span>Proyección a 120 Meses</span>
+              <span>Proyección Predictiva a 120 Meses</span>
             </div>
             <div>
-              Almacenamiento en PostgreSQL Local & Supabase Cloud
+              Almacenamiento Seguro en PostgreSQL Local & Supabase Cloud
             </div>
           </div>
         </footer>

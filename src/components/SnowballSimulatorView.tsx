@@ -117,24 +117,24 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
           </div>
 
           <div className="flex items-center gap-2 bg-[var(--surface-subtle)] p-1.5 rounded-xl border border-[var(--border-subtle)]">
-            <span className="text-xs font-semibold text-[var(--text-secondary)] pl-2">
+            <span className="text-xs font-bold text-[var(--text-secondary)] pl-2">
               Acelerar pago extra:
             </span>
             <button
               onClick={() => handleQuickAddExtra(500)}
-              className="px-2.5 py-1 text-xs font-bold rounded-lg bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
+              className="px-2.5 py-1 text-xs font-bold rounded-lg bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-hover)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95 cursor-pointer"
             >
               +$500
             </button>
             <button
               onClick={() => handleQuickAddExtra(1000)}
-              className="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95"
+              className="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 cursor-pointer"
             >
               +$1,000
             </button>
             <button
               onClick={onOpenConfigModal}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
+              className="px-2.5 py-1 text-xs font-semibold rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95 cursor-pointer"
             >
               Avanzado
             </button>

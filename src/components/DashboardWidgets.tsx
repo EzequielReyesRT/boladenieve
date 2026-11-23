@@ -47,36 +47,36 @@ export function DashboardWidgets({
   return (
     <div className="space-y-6">
       {/* Banner de Estado Hero */}
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-6 sm:p-8 text-[var(--text-primary)] shadow-sm">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-[var(--brand-surface)] blur-3xl" />
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-6 sm:p-8 text-[var(--text-primary)] shadow-xs">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[var(--brand-surface)] blur-3xl opacity-60" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-text)]">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)]"><Sparkles className="w-3.5 h-3.5" /></span>
-              PLAN DE PAGO ACTIVO
+          <div className="space-y-2.5">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--brand-surface)] border border-[var(--brand-border)] text-xs font-bold tracking-wide text-[var(--brand-text)]">
+              <Sparkles className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
+              <span>PLAN BOLA DE NIEVE ACTIVO</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
               Avanza hacia tu libertad financiera
             </h1>
-            <p className="text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-              Priorizando primero las deudas de menor saldo para ganar victorias psicológicas rápidas
-              y transferir ese flujo de caja en cascada a las siguientes.
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+              Priorizando deudas de menor saldo para conquistar victorias psicológicas rápidas
+              y transferir ese flujo de caja liberado en cascada hacia las siguientes.
             </p>
           </div>
 
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
             <button
               onClick={onOpenAddDebtModal}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--surface-card)] hover:bg-[var(--surface-subtle)] text-[var(--text-primary)] text-sm font-semibold border border-[var(--border-subtle)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--surface-subtle)] hover:bg-[var(--surface-muted)] text-[var(--text-primary)] text-xs font-bold border border-[var(--border-subtle)] hover:border-[var(--border-strong)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98 cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
-              Nueva Deuda
+              <Plus className="w-4 h-4 text-[var(--text-muted)]" />
+              <span>Nueva Deuda</span>
             </button>
             <button
               onClick={onGoToSimulator}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-hover)] text-white text-sm font-bold shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-98"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-hover)] text-white text-xs font-bold shadow-xs hover:shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-98 cursor-pointer"
             >
-              Ver Simulación
+              <span>Ver Simulación</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

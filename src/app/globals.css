@@ -248,7 +248,35 @@ table,
   border: 1px solid var(--border-subtle);
   border-radius: 1rem;
   padding: 1.25rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+/* Tarjeta KPI con micro-interacción */
+.kpi-card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+.kpi-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Badges semánticos */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
 }
 
 /* Custom scrollbars */

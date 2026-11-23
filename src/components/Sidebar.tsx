@@ -145,7 +145,7 @@ export function Sidebar({
               onOpenPaymentModal();
               setIsOpenMobile(false);
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white text-xs font-bold shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-98 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-hover)] text-white text-xs font-bold shadow-xs hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-98 transition-all cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Registrar Abono</span>
@@ -156,7 +156,7 @@ export function Sidebar({
               onOpenAddDebtModal();
               setIsOpenMobile(false);
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[var(--surface-subtle)] hover:bg-[var(--surface-muted)] text-[var(--text-primary)] text-xs font-semibold border border-[var(--border-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[var(--surface-subtle)] hover:bg-[var(--surface-muted)] text-[var(--text-primary)] text-xs font-semibold border border-[var(--border-subtle)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98 transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 text-[var(--text-muted)]" />
             <span>Agregar Deuda</span>
@@ -165,8 +165,8 @@ export function Sidebar({
 
         {/* Menú de Navegación Principal */}
         <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
-          <div className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-            Módulos
+          <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+            Módulos Principales
           </div>
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -176,28 +176,28 @@ export function Sidebar({
               <button
                 key={item.id}
                 onClick={() => handleSelectTab(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] cursor-pointer relative ${
                   isActive
-                    ? 'bg-[var(--brand-surface)] text-[var(--brand-text)] shadow-xs'
-                    : 'text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] active:scale-98'
+                    ? 'bg-[var(--brand-surface)] text-[var(--brand-text)] font-bold shadow-xs border-l-[3px] border-[var(--brand-primary)] pl-3'
+                    : 'text-[var(--text-secondary)] font-medium hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] active:scale-98'
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <Icon
-                    className={`w-4 h-4 transition-colors ${
+                    className={`w-4 h-4 shrink-0 transition-colors ${
                       isActive
                         ? 'text-[var(--brand-primary)]'
                         : 'text-[var(--text-muted)] group-hover:text-[var(--text-primary)]'
                     }`}
                   />
-                  <div className="text-left">
-                    <div className="leading-tight">{item.label}</div>
+                  <div className="text-left truncate">
+                    <div className="leading-tight truncate">{item.label}</div>
                   </div>
                 </div>
 
                 {item.badge !== null && (
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold tabular-nums ${
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold tabular-nums shrink-0 ${
                       isActive
                         ? 'bg-[var(--brand-primary)] text-white'
                         : 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50'
@@ -225,7 +225,7 @@ export function Sidebar({
                     : 'text-amber-500'
                 }`}
               />
-              <span className="text-[11px] font-medium text-[var(--text-secondary)]">
+              <span className="text-[11px] font-semibold text-[var(--text-secondary)]">
                 {connectionType === 'supabase'
                   ? 'Supabase Cloud'
                   : connectionType === 'local_postgres'
@@ -233,7 +233,10 @@ export function Sidebar({
                   : 'Modo Local'}
               </span>
             </div>
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
           </div>
 
           {/* Fila de controles: Configuración, Tema y Reset */}
