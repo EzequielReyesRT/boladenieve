@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import { useSnowball } from '@/context/SnowballContext';
 import { useAuth } from '@/context/AuthContext';
+import { ConfirmModal } from '@/components/ConfirmModal';
 import {
   LayoutDashboard,
   CreditCard,
@@ -46,6 +47,8 @@ export function Sidebar({
   const { theme, toggleTheme } = useTheme();
   const { deudasConSaldo, connectionType, resetToDemo } = useSnowball();
   const { user, logout } = useAuth();
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const deudasPendientes = deudasConSaldo.filter((d) => !d.esta_liquidada).length;
 
@@ -260,13 +263,10 @@ export function Sidebar({
             </button>
 
             <button
-              onClick={() => {
-                if (confirm('¿Deseas reiniciar la captura y limpiar todos los datos?')) {
-                  resetToDemo();
-                }
-              }}
+              onClick={() => setShowResetConfirm(true)}
               className="p-2 rounded-xl text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 active:scale-98 transition-all"
               title="Limpiar datos"
+              aria-label="Reiniciar y limpiar datos"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -298,13 +298,10 @@ export function Sidebar({
                 </div>
 
                 <button
-                  onClick={() => {
-                    if (confirm('¿Deseas cerrar tu sesión?')) {
-                      logout();
-                    }
-                  }}
+                  onClick={() => setShowLogoutConfirm(true)}
                   className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 active:scale-98 transition-all shrink-0"
                   title="Cerrar sesión"
+                  aria-label="Cerrar sesión"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -313,6 +310,35 @@ export function Sidebar({
           )}
         </div>
       </aside>
+
+      {/* Modales de Confirmación Accesibles */}
+      <ConfirmModal
+        isOpen={showResetConfirm}
+        title="¿Reiniciar datos?"
+        message="Esta acción limpiará todas las deudas, pagos y movimientos registrados para volver al modo demostración."
+        confirmText="Reiniciar datos"
+        cancelText="Conservar"
+        isDestructive={true}
+        onConfirm={() => {
+          resetToDemo();
+          setShowResetConfirm(false);
+        }}
+        onCancel={() => setShowResetConfirm(false)}
+      />
+
+      <ConfirmModal
+        isOpen={showLogoutConfirm}
+        title="¿Cerrar sesión?"
+        message="¿Estás seguro de que deseas cerrar tu sesión actual?"
+        confirmText="Cerrar sesión"
+        cancelText="Permanecer"
+        isDestructive={false}
+        onConfirm={() => {
+          setShowLogoutConfirm(false);
+          logout();
+        }}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </>
   );
 }

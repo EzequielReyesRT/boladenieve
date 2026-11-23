@@ -9,6 +9,7 @@ import {
   PlusCircle,
   Check,
   Sparkles,
+  AlertCircle,
 } from 'lucide-react';
 
 interface PaymentModalProps {
@@ -55,12 +56,14 @@ function PaymentForm({
   const [interesesCobrados, setInteresesCobrados] = useState<string>('0');
   const [folioComprobante, setFolioComprobante] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const deudaSeleccionada = deudasConSaldo.find((d) => d.id === deudaId);
 
   // Al cambiar la tarjeta/deuda seleccionada
   const handleDeudaChange = (newDeudaId: string) => {
     setDeudaId(newDeudaId);
+    setErrorMessage(null);
     const deuda = deudasConSaldo.find((d) => d.id === newDeudaId);
     if (!deuda) return;
 
@@ -76,6 +79,7 @@ function PaymentForm({
   // Al cambiar el tipo de pago
   const handleTipoPagoChange = (newTipo: TipoPago) => {
     setTipoPago(newTipo);
+    setErrorMessage(null);
     const deuda = deudasConSaldo.find((d) => d.id === deudaId);
     if (!deuda) return;
 
@@ -97,12 +101,14 @@ function PaymentForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
+
     if (!deudaId) {
-      alert('Por favor selecciona una tarjeta o deuda.');
+      setErrorMessage('Por favor selecciona una tarjeta o deuda.');
       return;
     }
     if (montoNum <= 0) {
-      alert('El monto del pago debe ser mayor a cero.');
+      setErrorMessage('El monto del pago debe ser mayor a cero.');
       return;
     }
 
@@ -119,7 +125,7 @@ function PaymentForm({
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Error al registrar el pago');
+      setErrorMessage('Ocurrió un error al registrar el pago.');
     } finally {
       setIsSubmitting(false);
     }
@@ -129,6 +135,12 @@ function PaymentForm({
     <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
       {/* Contenido scrolleable para celulares y pantallas pequeñas */}
       <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
+        {errorMessage && (
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 text-rose-700 dark:text-rose-300 text-xs animate-in fade-in duration-200">
+            <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
         {/* Tarjeta destino */}
         <div>
           <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">

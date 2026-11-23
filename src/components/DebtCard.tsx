@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { DeudaConSaldoActual } from '@/types';
 import { formatoMoneda, formatoPorcentaje } from '@/lib/snowball-engine';
+import { ConfirmModal } from '@/components/ConfirmModal';
 import {
   Flame,
   CheckCircle,
@@ -35,6 +36,7 @@ export function DebtCard({
   onDelete,
 }: DebtCardProps) {
   const isPaid = deuda.esta_liquidada;
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   return (
     <div
@@ -96,11 +98,7 @@ export function DebtCard({
             <Edit2 className="w-4 h-4" />
           </button>
           <button
-            onClick={() => {
-              if (confirm(`¿Eliminar la deuda "${deuda.nombre_tarjeta}" y su historial de pagos?`)) {
-                onDelete(deuda.id);
-              }
-            }}
+            onClick={() => setShowDeleteConfirm(true)}
             aria-label={`Eliminar ${deuda.nombre_tarjeta}`}
             title="Eliminar deuda"
             className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--status-danger)] hover:bg-[var(--status-danger-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] active:scale-95 transition-all"
@@ -179,6 +177,19 @@ export function DebtCard({
           </button>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="¿Eliminar deuda?"
+        message={`¿Estás seguro de eliminar "${deuda.nombre_tarjeta}" y todo su historial de pagos? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar deuda"
+        isDestructive={true}
+        onConfirm={() => {
+          onDelete(deuda.id);
+          setShowDeleteConfirm(false);
+        }}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   );
 }

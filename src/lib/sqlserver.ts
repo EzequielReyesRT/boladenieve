@@ -42,6 +42,17 @@ async function getPool(): Promise<sql.ConnectionPool | null> {
   const config = getSqlConfig();
   if (!config) return null;
 
+  if (poolPromise) {
+    try {
+      const existing = await poolPromise;
+      if (existing && !existing.connected && !existing.connecting) {
+        poolPromise = null;
+      }
+    } catch {
+      poolPromise = null;
+    }
+  }
+
   if (!poolPromise) {
     poolPromise = sql
       .connect(config)

@@ -8,6 +8,7 @@ import {
   Zap,
   Gift,
   Check,
+  AlertCircle,
 } from 'lucide-react';
 
 interface ConfigModalProps {
@@ -39,9 +40,11 @@ function ConfigForm({ onClose }: { onClose: () => void }) {
   const [aportacionAnual, setAportacionAnual] = useState((config.aportacion_unica_anual || 0).toString());
   const [mesAportacion, setMesAportacion] = useState(config.mes_aportacion_unica || 12);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
     setIsSubmitting(true);
     try {
       await updateConfig({
@@ -54,7 +57,7 @@ function ConfigForm({ onClose }: { onClose: () => void }) {
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Error al actualizar la configuración');
+      setErrorMessage('Ocurrió un error al actualizar la configuración.');
     } finally {
       setIsSubmitting(false);
     }
@@ -63,6 +66,12 @@ function ConfigForm({ onClose }: { onClose: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
+        {errorMessage && (
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 text-rose-700 dark:text-rose-300 text-xs animate-in fade-in duration-200">
+            <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
         {/* Pago Extra Mensual */}
         <div className="p-4 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)]">
           <div className="flex items-center gap-2 mb-2 text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-wider">

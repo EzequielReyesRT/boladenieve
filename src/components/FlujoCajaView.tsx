@@ -21,6 +21,7 @@ import {
   Repeat,
   Scale,
 } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 interface FlujoCajaViewProps {
   onOpenNewMovimiento: (tipo?: TipoMovimiento) => void;
@@ -57,6 +58,7 @@ export function FlujoCajaView({
   // Fecha seleccionada para filtros (inicializada estática y sincronizada en cliente para evitar new Date() en prerender)
   const [mesSeleccionado, setMesSeleccionado] = useState<number>(11);
   const [anioSeleccionado, setAnioSeleccionado] = useState<number>(2026);
+  const [movimientoToDelete, setMovimientoToDelete] = useState<{ id: string; descripcion: string; esAbonoTarjeta: boolean } | null>(null);
 
   React.useEffect(() => {
     const hoy = new Date();
@@ -546,15 +548,14 @@ export function FlujoCajaView({
                         </button>
                       )}
                       <button
-                        onClick={() => {
-                          const msg = esAbonoTarjeta
-                            ? `Este movimiento proviene de un abono a tarjeta registrado en la Bitácora.\n\n¿Deseas eliminarlo de Flujo de Caja? (Nota: para revertir el saldo de la deuda, se recomienda eliminarlo desde la Bitácora de Pagos).`
-                            : `¿Eliminar este movimiento "${mov.descripcion}"?`;
-                          if (confirm(msg)) {
-                            deleteMovimientoFlujo(mov.id);
-                          }
-                        }}
-                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 active:scale-95"
+                        onClick={() =>
+                          setMovimientoToDelete({
+                            id: mov.id,
+                            descripcion: mov.descripcion,
+                            esAbonoTarjeta,
+                          })
+                        }
+                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 active:scale-95 cursor-pointer"
                         title="Eliminar movimiento"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -567,6 +568,25 @@ export function FlujoCajaView({
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={Boolean(movimientoToDelete)}
+        title="¿Eliminar movimiento?"
+        message={
+          movimientoToDelete?.esAbonoTarjeta
+            ? `Este movimiento proviene de un abono a tarjeta registrado en la Bitácora.\n\n¿Deseas eliminarlo de Flujo de Caja? (Nota: para revertir el saldo de la deuda, se recomienda eliminarlo desde la Bitácora de Pagos).`
+            : `¿Estás seguro de eliminar el movimiento "${movimientoToDelete?.descripcion}"? Esta acción no se puede deshacer.`
+        }
+        confirmText="Eliminar movimiento"
+        isDestructive={true}
+        onConfirm={() => {
+          if (movimientoToDelete) {
+            deleteMovimientoFlujo(movimientoToDelete.id);
+            setMovimientoToDelete(null);
+          }
+        }}
+        onCancel={() => setMovimientoToDelete(null)}
+      />
     </div>
   );
 }

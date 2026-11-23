@@ -9,6 +9,7 @@ import {
   Trash2,
   PlusCircle,
 } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 interface PaymentHistoryTableProps {
   onOpenPaymentModal: () => void;
@@ -41,6 +42,7 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
   const { bitacora, deudas, deletePago } = useSnowball();
   const [filterDeudaId, setFilterDeudaId] = useState<string>('all');
   const [filterTipo, setFilterTipo] = useState<string>('all');
+  const [pagoToDelete, setPagoToDelete] = useState<{ id: string; monto: number } | null>(null);
 
   const deudaMap = new Map(deudas.map((d) => [d.id, d.nombre_tarjeta]));
   const hasActiveFilters = filterDeudaId !== 'all' || filterTipo !== 'all';
@@ -243,14 +245,10 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
                     </td>
                     <td className="py-3.5 px-4 text-center">
                       <button
-                        onClick={() => {
-                          if (confirm('¿Eliminar este pago de la bitácora?')) {
-                            deletePago(pago.id);
-                          }
-                        }}
+                        onClick={() => setPagoToDelete({ id: pago.id, monto: pago.monto_total })}
                         title="Eliminar registro"
                         aria-label={`Eliminar pago de ${formatoMoneda(pago.monto_total)}`}
-                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 active:scale-95 transition-all"
+                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 active:scale-95 transition-all cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -262,6 +260,25 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
           </table>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={Boolean(pagoToDelete)}
+        title="¿Eliminar pago?"
+        message={
+          pagoToDelete
+            ? `¿Estás seguro de eliminar el registro de pago por ${formatoMoneda(pagoToDelete.monto)}? Esta acción recalculará los saldos de tu deuda.`
+            : ''
+        }
+        confirmText="Eliminar pago"
+        isDestructive={true}
+        onConfirm={() => {
+          if (pagoToDelete) {
+            deletePago(pagoToDelete.id);
+            setPagoToDelete(null);
+          }
+        }}
+        onCancel={() => setPagoToDelete(null)}
+      />
     </div>
   );
 }

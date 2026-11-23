@@ -7,6 +7,7 @@ import {
   X,
   CreditCard,
   Check,
+  AlertCircle,
 } from 'lucide-react';
 
 interface DebtModalProps {
@@ -46,11 +47,14 @@ function DebtForm({
   const [costoAnualidad, setCostoAnualidad] = useState((debtToEdit?.costo_anualidad || 0).toString());
   const [mesAnualidad, setMesAnualidad] = useState(debtToEdit?.mes_cobro_anualidad || 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
+
     if (!nombreTarjeta.trim()) {
-      alert('Ingresa el nombre de la tarjeta o deuda');
+      setErrorMessage('Ingresa el nombre de la tarjeta o deuda.');
       return;
     }
     const saldo = parseFloat(saldoInicial) || 0;
@@ -59,7 +63,7 @@ function DebtForm({
     const anualidad = parseFloat(costoAnualidad) || 0;
 
     if (saldo <= 0) {
-      alert('El saldo inicial debe ser mayor a cero');
+      setErrorMessage('El saldo inicial debe ser mayor a cero.');
       return;
     }
 
@@ -88,7 +92,7 @@ function DebtForm({
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Error al guardar la deuda');
+      setErrorMessage('Ocurrió un error al guardar la deuda.');
     } finally {
       setIsSubmitting(false);
     }
@@ -97,6 +101,12 @@ function DebtForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
+        {errorMessage && (
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 text-rose-700 dark:text-rose-300 text-xs animate-in fade-in duration-200">
+            <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
         <div>
           <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
             Nombre de la Tarjeta o Crédito
