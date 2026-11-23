@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getSessionUser } from '@/lib/auth';
+import { validateMovimientoFlujo } from '@/lib/validation';
 import { MovimientoFlujo } from '@/types';
 import {
   syncMovimientoFlujoInsert,
@@ -84,19 +85,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
     }
 
-    const body: Partial<MovimientoFlujo> = await request.json();
-    if (!body || !body.descripcion || body.monto === undefined || body.monto === null) {
+    const rawBody: Partial<MovimientoFlujo> = await request.json();
+    const validation = validateMovimientoFlujo(rawBody);
+
+    if (!validation.isValid) {
       return NextResponse.json(
-        { error: 'Descripción y monto son requeridos para registrar el movimiento.' },
+        { error: 'Datos de movimiento inválidos', details: validation.errors },
         { status: 400 }
       );
     }
 
+    const { data } = validation;
     const db = getDb();
-    const id = body.id || `flujo-${Date.now()}`;
-    const monto = Number(body.monto) || 0;
-    const esRecurrente = Boolean(body.es_recurrente);
-    const fecha = body.fecha || new Date().toISOString().split('T')[0];
+    const id = data.id || `flujo-${Date.now()}`;
     const userId = session.id;
 
     // 1. Guardar en base de datos local PGlite
@@ -109,24 +110,24 @@ export async function POST(request: Request) {
       [
         id,
         userId,
-        body.tipo || 'Gasto',
-        body.categoria || 'Varios',
-        body.descripcion,
-        monto,
-        fecha,
-        esRecurrente,
+        data.tipo,
+        data.categoria,
+        data.descripcion,
+        data.monto,
+        data.fecha,
+        data.es_recurrente,
       ]
     );
 
     // 2. Replicar a SQL Server si está disponible (método seguro sin shell ni credenciales expuestas)
     await syncMovimientoFlujoInsert({
       id,
-      tipo: body.tipo || 'Gasto',
-      categoria: body.categoria || 'Varios',
-      descripcion: body.descripcion,
-      monto,
-      fecha,
-      es_recurrente: esRecurrente,
+      tipo: data.tipo,
+      categoria: data.categoria,
+      descripcion: data.descripcion,
+      monto: data.monto,
+      fecha: data.fecha,
+      es_recurrente: data.es_recurrente,
     });
 
     return NextResponse.json({ success: true, id });
@@ -143,18 +144,27 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
     }
 
-    const body: Partial<MovimientoFlujo> = await request.json();
-    if (!body || !body.id) {
+    const rawBody: Partial<MovimientoFlujo> = await request.json();
+    if (!rawBody || !rawBody.id) {
       return NextResponse.json(
         { error: 'El ID del movimiento es requerido para actualizar.' },
         { status: 400 }
       );
     }
 
+    const validation = validateMovimientoFlujo(rawBody);
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { error: 'Datos de movimiento inválidos', details: validation.errors },
+        { status: 400 }
+      );
+    }
+
+    const { data } = validation;
     const db = getDb();
 
     // Prevención de IDOR: comprobar propiedad antes de actualizar
-    const existing = await db.query<{ user_id?: string }>('SELECT user_id FROM movimientos_flujo WHERE id = $1', [body.id]);
+    const existing = await db.query<{ user_id?: string }>('SELECT user_id FROM movimientos_flujo WHERE id = $1', [data.id]);
     if (existing.rows.length === 0) {
       return NextResponse.json({ error: 'Movimiento no encontrado' }, { status: 404 });
     }
@@ -170,10 +180,6 @@ export async function PUT(request: Request) {
       );
     }
 
-    const monto = Number(body.monto) || 0;
-    const esRecurrente = Boolean(body.es_recurrente);
-    const fecha = body.fecha || new Date().toISOString().split('T')[0];
-
     // 1. Actualizar en PGlite
     await db.query(
       `
@@ -188,25 +194,25 @@ export async function PUT(request: Request) {
       WHERE id = $7
       `,
       [
-        body.tipo || 'Gasto',
-        body.categoria || 'Varios',
-        body.descripcion || '',
-        monto,
-        fecha,
-        esRecurrente,
-        body.id,
+        data.tipo,
+        data.categoria,
+        data.descripcion,
+        data.monto,
+        data.fecha,
+        data.es_recurrente,
+        data.id,
       ]
     );
 
     // 2. Replicar actualización a SQL Server de forma segura
     await syncMovimientoFlujoUpdate({
-      id: body.id,
-      tipo: body.tipo || 'Gasto',
-      categoria: body.categoria || 'Varios',
-      descripcion: body.descripcion || '',
-      monto,
-      fecha,
-      es_recurrente: esRecurrente,
+      id: data.id,
+      tipo: data.tipo,
+      categoria: data.categoria,
+      descripcion: data.descripcion,
+      monto: data.monto,
+      fecha: data.fecha,
+      es_recurrente: data.es_recurrente,
     });
 
     return NextResponse.json({ success: true });

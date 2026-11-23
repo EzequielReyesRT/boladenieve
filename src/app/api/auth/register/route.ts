@@ -1,8 +1,29 @@
 import { NextResponse } from 'next/server';
 import { registerNewUser, generateToken, COOKIE_NAME } from '@/lib/auth';
+import { getClientIp, checkRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    // Limitación de tasa para creación de cuentas (5 registros por hora por IP)
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`register:${ip}`, 5, 3600);
+
+    if (!rateLimit.allowed) {
+      const minutes = Math.ceil(rateLimit.resetInSeconds / 60);
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Límite de registros alcanzado. Por favor intenta de nuevo en ${minutes} minuto${minutes > 1 ? 's' : ''}.`,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(rateLimit.resetInSeconds),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { nombre, email, password } = body;
 

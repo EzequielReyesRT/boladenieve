@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getSessionUser } from '@/lib/auth';
+import { validateConfig } from '@/lib/validation';
 import { ConfiguracionUsuario } from '@/types';
 
 interface ConfigRow {
@@ -59,15 +60,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
     }
 
-    const body: ConfiguracionUsuario = await request.json();
+    const rawBody: Partial<ConfiguracionUsuario> = await request.json();
+    const validation = validateConfig(rawBody);
+
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { error: 'Datos de configuración inválidos', details: validation.errors },
+        { status: 400 }
+      );
+    }
+
+    const { data } = validation;
     const db = getDb();
-    const configId = body.id || `config-${session.id}`;
+    const configId = data.id || `config-${session.id}`;
 
     // Prevención de IDOR: si se proporciona un ID existente, verificar propiedad
-    if (body.id) {
+    if (data.id) {
       const existing = await db.query<{ user_id?: string }>(
         'SELECT user_id FROM configuracion_usuario WHERE id = $1',
-        [body.id]
+        [data.id]
       );
       if (
         existing.rows.length > 0 &&
@@ -100,15 +111,15 @@ export async function POST(request: Request) {
       [
         configId,
         session.id,
-        body.pago_extra_mensual || 0,
-        body.mes_calendario_inicio || 1,
-        body.anio_inicio || 2026,
-        body.aportacion_unica_anual || 0,
-        body.mes_aportacion_unica || 12,
+        data.pago_extra_mensual,
+        data.mes_calendario_inicio,
+        data.anio_inicio,
+        data.aportacion_unica_anual,
+        data.mes_aportacion_unica,
       ]
     );
 
-    return NextResponse.json({ success: true, config: { ...body, id: configId, user_id: session.id } });
+    return NextResponse.json({ success: true, config: { ...data, id: configId, user_id: session.id } });
   } catch (error) {
     console.error('Error updating config in DB:', error);
     return NextResponse.json({ error: 'Error al guardar configuración' }, { status: 500 });

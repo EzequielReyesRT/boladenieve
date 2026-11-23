@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { authenticateUser, generateToken, COOKIE_NAME } from '@/lib/auth';
+import { getClientIp, checkRateLimit, resetRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
@@ -13,14 +14,43 @@ export async function POST(request: Request) {
       );
     }
 
+    // Limitación de tasa contra ataques de fuerza bruta (5 intentos por 15 minutos)
+    const ip = getClientIp(request);
+    const cleanUser = String(username).trim().toLowerCase();
+    const rateLimitKey = `login:${ip}:${cleanUser}`;
+    const rateLimit = checkRateLimit(rateLimitKey, 5, 900);
+
+    if (!rateLimit.allowed) {
+      const minutes = Math.ceil(rateLimit.resetInSeconds / 60);
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Demasiados intentos fallidos. Por seguridad, por favor intenta nuevamente en ${minutes} minuto${minutes > 1 ? 's' : ''}.`,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(rateLimit.resetInSeconds),
+          },
+        }
+      );
+    }
+
     const user = await authenticateUser(username, password);
 
     if (!user) {
       return NextResponse.json(
-        { success: false, error: 'Usuario o contraseña incorrectos.' },
+        {
+          success: false,
+          error: 'Usuario o contraseña incorrectos.',
+          intentosRestantes: rateLimit.remaining,
+        },
         { status: 401 }
       );
     }
+
+    // Inicio de sesión exitoso: reiniciar contador de intentos fallidos
+    resetRateLimit(rateLimitKey);
 
     const days = rememberMe ? 30 : 1;
     const token = generateToken(user, days);

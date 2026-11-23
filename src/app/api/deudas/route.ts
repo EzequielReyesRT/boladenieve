@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getSessionUser } from '@/lib/auth';
+import { validateDeuda } from '@/lib/validation';
 import { Deuda } from '@/types';
 
 interface DeudaRow {
@@ -58,13 +59,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
     }
 
-    const body: Deuda = await request.json();
-    if (!body || !body.nombre_tarjeta) {
-      return NextResponse.json({ error: 'El nombre de la tarjeta o deuda es requerido.' }, { status: 400 });
+    const rawBody: Partial<Deuda> = await request.json();
+    const validation = validateDeuda(rawBody);
+
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { error: 'Datos de deuda inválidos', details: validation.errors },
+        { status: 400 }
+      );
     }
 
+    const { data } = validation;
     const db = getDb();
-    const id = body.id || `d-${Date.now()}`;
+    const id = data.id || `d-${Date.now()}`;
     const userId = session.id;
 
     await db.query(
@@ -76,12 +83,12 @@ export async function POST(request: Request) {
       [
         id,
         userId,
-        body.nombre_tarjeta,
-        body.saldo_inicial,
-        body.tasa_anual_porcentaje,
-        body.pago_minimo,
-        body.costo_anualidad || 0,
-        body.mes_cobro_anualidad || 1,
+        data.nombre_tarjeta,
+        data.saldo_inicial,
+        data.tasa_anual_porcentaje,
+        data.pago_minimo,
+        data.costo_anualidad,
+        data.mes_cobro_anualidad,
       ]
     );
 
@@ -99,15 +106,24 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
     }
 
-    const body: Deuda = await request.json();
-    if (!body || !body.id) {
+    const rawBody: Partial<Deuda> = await request.json();
+    if (!rawBody || !rawBody.id) {
       return NextResponse.json({ error: 'El ID de la deuda es requerido para actualizar.' }, { status: 400 });
     }
 
+    const validation = validateDeuda(rawBody);
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { error: 'Datos de deuda inválidos', details: validation.errors },
+        { status: 400 }
+      );
+    }
+
+    const { data } = validation;
     const db = getDb();
 
     // Prevención de IDOR: verificar propiedad del recurso
-    const existing = await db.query<DeudaRow>('SELECT id, user_id FROM deudas WHERE id = $1', [body.id]);
+    const existing = await db.query<DeudaRow>('SELECT id, user_id FROM deudas WHERE id = $1', [data.id]);
     if (existing.rows.length === 0) {
       return NextResponse.json({ error: 'Deuda no encontrada' }, { status: 404 });
     }
@@ -136,13 +152,13 @@ export async function PUT(request: Request) {
       WHERE id = $7
     `,
       [
-        body.nombre_tarjeta,
-        body.saldo_inicial,
-        body.tasa_anual_porcentaje,
-        body.pago_minimo,
-        body.costo_anualidad || 0,
-        body.mes_cobro_anualidad || 1,
-        body.id,
+        data.nombre_tarjeta,
+        data.saldo_inicial,
+        data.tasa_anual_porcentaje,
+        data.pago_minimo,
+        data.costo_anualidad,
+        data.mes_cobro_anualidad,
+        data.id,
       ]
     );
 

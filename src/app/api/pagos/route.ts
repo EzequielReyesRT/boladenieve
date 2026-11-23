@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getSessionUser } from '@/lib/auth';
+import { validatePago } from '@/lib/validation';
 import { BitacoraPago } from '@/types';
 import { syncPagoInsert, syncPagoDelete } from '@/lib/sqlserver';
 
@@ -57,15 +58,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
     }
 
-    const body: BitacoraPago = await request.json();
+    const rawBody: Partial<BitacoraPago> = await request.json();
+    const validation = validatePago(rawBody);
+
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { error: 'Datos de pago inválidos', details: validation.errors },
+        { status: 400 }
+      );
+    }
+
+    const { data } = validation;
     const db = getDb();
-    const id = body.id || `p-${Date.now()}`;
+    const id = data.id || `p-${Date.now()}`;
     const userId = session.id;
 
     // Prevención de IDOR: comprobar que la deuda destino pertenece al usuario autenticado
     const deudaRes = await db.query<{ nombre_tarjeta: string; user_id?: string }>(
       'SELECT nombre_tarjeta, user_id FROM deudas WHERE id = $1 LIMIT 1',
-      [body.deuda_id]
+      [data.deuda_id]
     );
 
     if (deudaRes.rows.length === 0) {
@@ -94,19 +105,19 @@ export async function POST(request: Request) {
     `,
       [
         id,
-        body.deuda_id,
+        data.deuda_id,
         userId,
-        body.fecha_pago,
-        body.tipo_pago,
-        body.monto_total,
-        body.intereses_cobrados || 0,
-        body.folio_comprobante || null,
+        data.fecha_pago,
+        data.tipo_pago,
+        data.monto_total,
+        data.intereses_cobrados,
+        data.folio_comprobante || null,
       ]
     );
 
     // 2. Registrar automáticamente en movimientos_flujo como Gasto
     const flujoId = `flujo-pago-${id}`;
-    const desc = `Abono a ${nombreTarjeta} (${body.tipo_pago})`;
+    const desc = `Abono a ${nombreTarjeta} (${data.tipo_pago})`;
     const cat = 'Pago de Tarjeta / Crédito';
 
     await db.query(
@@ -125,14 +136,14 @@ export async function POST(request: Request) {
         'Gasto',
         cat,
         desc,
-        body.monto_total,
-        body.fecha_pago,
+        data.monto_total,
+        data.fecha_pago,
         false,
       ]
     );
 
     // 3. Replicar a SQL Server si está disponible (método seguro sin shell ni credenciales expuestas)
-    await syncPagoInsert(body, nombreTarjeta);
+    await syncPagoInsert(data, nombreTarjeta);
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
