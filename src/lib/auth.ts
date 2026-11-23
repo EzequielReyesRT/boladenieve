@@ -25,7 +25,9 @@ export function getSessionSecret(): string {
   // En producción, NUNCA usar la clave insegura conocida en el repositorio
   if (process.env.NODE_ENV === 'production') {
     console.error(
-      '⚠️ [SEGURIDAD] SESSION_SECRET no configurada o insegura en producción. Generando clave criptográfica efímera.'
+      '⚠️ [SEGURIDAD CRÍTICA] SESSION_SECRET no configurada en variables de entorno de producción (ej. panel de Vercel). ' +
+      'Se ha generado una clave efímera para esta instancia, pero en entornos serverless multi-instancia ' +
+      'debes definir SESSION_SECRET (mínimo 32 caracteres) para evitar invalidación intermitente de sesiones.'
     );
     cachedSecret = crypto.randomBytes(64).toString('hex');
     return cachedSecret;

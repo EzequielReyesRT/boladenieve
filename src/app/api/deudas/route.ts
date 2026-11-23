@@ -59,6 +59,10 @@ export async function POST(request: Request) {
     }
 
     const body: Deuda = await request.json();
+    if (!body || !body.nombre_tarjeta) {
+      return NextResponse.json({ error: 'El nombre de la tarjeta o deuda es requerido.' }, { status: 400 });
+    }
+
     const db = getDb();
     const id = body.id || `d-${Date.now()}`;
     const userId = session.id;
@@ -96,6 +100,10 @@ export async function PUT(request: Request) {
     }
 
     const body: Deuda = await request.json();
+    if (!body || !body.id) {
+      return NextResponse.json({ error: 'El ID de la deuda es requerido para actualizar.' }, { status: 400 });
+    }
+
     const db = getDb();
 
     // Prevención de IDOR: verificar propiedad del recurso

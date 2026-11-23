@@ -84,7 +84,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body: Partial<MovimientoFlujo> = await request.json();
+    if (!body || !body.descripcion || body.monto === undefined || body.monto === null) {
+      return NextResponse.json(
+        { error: 'Descripción y monto son requeridos para registrar el movimiento.' },
+        { status: 400 }
+      );
+    }
+
     const db = getDb();
     const id = body.id || `flujo-${Date.now()}`;
     const monto = Number(body.monto) || 0;
@@ -102,8 +109,8 @@ export async function POST(request: Request) {
       [
         id,
         userId,
-        body.tipo,
-        body.categoria,
+        body.tipo || 'Gasto',
+        body.categoria || 'Varios',
         body.descripcion,
         monto,
         fecha,
@@ -114,8 +121,8 @@ export async function POST(request: Request) {
     // 2. Replicar a SQL Server si está disponible (método seguro sin shell ni credenciales expuestas)
     await syncMovimientoFlujoInsert({
       id,
-      tipo: body.tipo,
-      categoria: body.categoria,
+      tipo: body.tipo || 'Gasto',
+      categoria: body.categoria || 'Varios',
       descripcion: body.descripcion,
       monto,
       fecha,
@@ -136,7 +143,14 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body: Partial<MovimientoFlujo> = await request.json();
+    if (!body || !body.id) {
+      return NextResponse.json(
+        { error: 'El ID del movimiento es requerido para actualizar.' },
+        { status: 400 }
+      );
+    }
+
     const db = getDb();
 
     // Prevención de IDOR: comprobar propiedad antes de actualizar
@@ -174,9 +188,9 @@ export async function PUT(request: Request) {
       WHERE id = $7
       `,
       [
-        body.tipo,
-        body.categoria,
-        body.descripcion,
+        body.tipo || 'Gasto',
+        body.categoria || 'Varios',
+        body.descripcion || '',
         monto,
         fecha,
         esRecurrente,
@@ -187,9 +201,9 @@ export async function PUT(request: Request) {
     // 2. Replicar actualización a SQL Server de forma segura
     await syncMovimientoFlujoUpdate({
       id: body.id,
-      tipo: body.tipo,
-      categoria: body.categoria,
-      descripcion: body.descripcion,
+      tipo: body.tipo || 'Gasto',
+      categoria: body.categoria || 'Varios',
+      descripcion: body.descripcion || '',
       monto,
       fecha,
       es_recurrente: esRecurrente,

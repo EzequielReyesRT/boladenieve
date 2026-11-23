@@ -73,6 +73,10 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     async function loadData() {
       if (isAuthLoading) return;
       if (!isAuthenticated) {
+        setConfig(CONFIG_INICIAL);
+        setDeudas([]);
+        setBitacora([]);
+        setMovimientosFlujo([]);
         setIsLoaded(true);
         return;
       }
