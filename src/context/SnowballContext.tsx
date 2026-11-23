@@ -190,6 +190,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const d = new Date();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Requerido por Next.js 16 para evitar new Date() en prerender estatico
     setCurrentMonth(d.getMonth() + 1);
     setCurrentYear(d.getFullYear());
   }, []);

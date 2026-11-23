@@ -47,20 +47,17 @@ export function DashboardWidgets({
   return (
     <div className="space-y-6">
       {/* Banner de Estado Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 p-6 text-white shadow-xl">
-        <div className="absolute right-0 top-0 -mt-8 -mr-8 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute left-1/3 bottom-0 -mb-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-
+      <div className="relative overflow-hidden rounded-2xl bg-slate-900 dark:bg-[var(--surface-card)] border border-slate-800 dark:border-[var(--border-subtle)] p-6 text-white shadow-sm">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
               Estrategia Bola de Nieve Activa
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white dark:text-[var(--text-primary)]">
               Tu Camino hacia la Libertad Financiera
             </h1>
-            <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
+            <p className="text-sm text-slate-300 dark:text-[var(--text-secondary)] max-w-2xl leading-relaxed">
               Priorizando primero las deudas de menor saldo para ganar victorias psicológicas rápidas
               y transferir ese flujo de caja en cascada a las siguientes.
             </p>
@@ -69,14 +66,14 @@ export function DashboardWidgets({
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
             <button
               onClick={onOpenAddDebtModal}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-semibold border border-white/20 backdrop-blur-sm transition-all"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 dark:bg-[var(--surface-subtle)] dark:hover:bg-[var(--surface-muted)] text-white dark:text-[var(--text-primary)] text-sm font-semibold border border-white/20 dark:border-[var(--border-subtle)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98"
             >
               <Plus className="w-4 h-4" />
               Nueva Deuda
             </button>
             <button
               onClick={onGoToSimulator}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-sm font-bold shadow-lg shadow-emerald-500/25 active:scale-95 transition-all"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white text-sm font-bold shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-98"
             >
               Ver Simulación
               <ArrowRight className="w-4 h-4" />
@@ -90,102 +87,113 @@ export function DashboardWidgets({
         {/* Widget 1: Deuda Total Actual */}
         <div
           onClick={onGoToDeudas}
-          className={`rounded-2xl p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all hover:shadow-md ${
-            onGoToDeudas ? 'cursor-pointer hover:border-slate-300 dark:hover:border-slate-700' : ''
+          className={`rounded-2xl p-5 bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs relative overflow-hidden transition-all ${
+            onGoToDeudas
+              ? 'cursor-pointer hover:border-[var(--border-strong)] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]'
+              : ''
           }`}
+          role={onGoToDeudas ? 'button' : undefined}
+          tabIndex={onGoToDeudas ? 0 : undefined}
+          onKeyDown={(e) => {
+            if (onGoToDeudas && (e.key === 'Enter' || e.key === ' ')) {
+              e.preventDefault();
+              onGoToDeudas();
+            }
+          }}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold tracking-wide uppercase text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-semibold tracking-wide uppercase text-[var(--text-muted)]">
               Deuda Total Actual
             </span>
-            <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            <div className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight tabular-nums">
               {formatoMoneda(deudaTotalActual)}
             </div>
-            <div className="mt-1 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <div className="mt-1 flex items-center gap-2 text-xs text-[var(--text-muted)] tabular-nums">
               <span>Inicial:</span>
               <span className="line-through">{formatoMoneda(deudaTotalOriginal)}</span>
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
-            <span className="text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-1">
+          <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
+            <span className="text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-1 tabular-nums">
               <TrendingDown className="w-3.5 h-3.5" />
               {totalDeudasPendientes} {totalDeudasPendientes === 1 ? 'pendiente' : 'pendientes'}
             </span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+            <span className="text-[var(--brand-primary)] font-semibold tabular-nums">
               {totalDeudasLiquidadas} liquidadas
             </span>
           </div>
         </div>
 
         {/* Widget 2: Porcentaje de Avance General */}
-        <div className="rounded-2xl p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all hover:shadow-md">
+        <div className="rounded-2xl p-5 bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs relative overflow-hidden transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold tracking-wide uppercase text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-semibold tracking-wide uppercase text-[var(--text-muted)]">
               Avance General
             </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">
+            <div className="text-2xl sm:text-3xl font-extrabold text-[var(--brand-primary)] tracking-tight tabular-nums">
               {formatoPorcentaje(porcentajeAvanceGlobal)}
             </div>
-            <div className="mt-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+            <div className="mt-2 w-full bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-full h-2 overflow-hidden">
               <div
-                className="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full transition-all duration-700"
-                style={{ width: `${porcentajeAvanceGlobal}%` }}
+                className="bg-[var(--brand-primary)] h-2 rounded-full transition-all duration-700"
+                style={{ width: `${Math.min(100, Math.max(0, porcentajeAvanceGlobal))}%` }}
               />
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs text-[var(--text-muted)]">
             <span>Amortizado:</span>
-            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+            <span className="font-semibold text-[var(--brand-primary)] tabular-nums">
               {formatoMoneda(Math.max(0, deudaTotalOriginal - deudaTotalActual))}
             </span>
           </div>
         </div>
 
         {/* Widget 3: Pago Extra Mensual */}
-        <div className="rounded-2xl p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all hover:shadow-md">
+        <div className="rounded-2xl p-5 bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs relative overflow-hidden transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold tracking-wide uppercase text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-semibold tracking-wide uppercase text-[var(--text-muted)]">
               Pago Extra Mensual
             </span>
             <button
               onClick={onOpenConfigModal}
               title="Modificar aportación extra"
-              className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center hover:bg-indigo-200 transition-colors"
+              aria-label="Modificar aportación extra en configuración"
+              className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center hover:bg-indigo-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 transition-all"
             >
               <Zap className="w-4 h-4" />
             </button>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight">
+            <div className="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight tabular-nums">
               {formatoMoneda(config.pago_extra_mensual)}
             </div>
-            <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            <div className="mt-1 text-xs text-[var(--text-muted)]">
               Acelerador inyectado cada mes a la deuda #1
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
-            <span className="text-slate-500 dark:text-slate-400">Anual (Mes {config.mes_aportacion_unica}):</span>
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+          <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
+            <span className="text-[var(--text-muted)]">Anual (Mes {config.mes_aportacion_unica}):</span>
+            <span className="font-semibold text-indigo-600 dark:text-indigo-400 tabular-nums">
               {formatoMoneda(config.aportacion_unica_anual)}
             </span>
           </div>
           {onGoToFlujo && (
             <button
               onClick={onGoToFlujo}
-              className="mt-2.5 w-full flex items-center justify-between text-[11px] px-2 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
+              className="mt-2.5 w-full flex items-center justify-between text-[11px] px-2 py-1.5 rounded-lg bg-[var(--brand-surface)] border border-[var(--brand-border)] text-[var(--brand-text)] hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98 transition-all"
             >
               <span>Flujo libre este mes:</span>
-              <span className="font-bold">
+              <span className="font-bold tabular-nums">
                 {resumenFlujoMes ? formatoMoneda(resumenFlujoMes.flujo_neto_disponible) : '$0.00'} →
               </span>
             </button>
@@ -193,26 +201,26 @@ export function DashboardWidgets({
         </div>
 
         {/* Widget 4: Meta Bola de Nieve */}
-        <div className="rounded-2xl p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all hover:shadow-md">
+        <div className="rounded-2xl p-5 bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs relative overflow-hidden transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold tracking-wide uppercase text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-semibold tracking-wide uppercase text-[var(--text-muted)]">
               Meta Bola de Nieve
             </span>
-            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center">
               <Calendar className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400 tracking-tight">
+            <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400 tracking-tight tabular-nums">
               {simulacion.meses_totales > 0 ? `${simulacion.meses_totales} meses` : '¡Libre!'}
             </div>
-            <div className="mt-1 text-xs font-medium text-slate-600 dark:text-slate-300">
+            <div className="mt-1 text-xs font-medium text-[var(--text-secondary)]">
               {simulacion.fecha_libertad_financiera}
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs text-[var(--text-muted)]">
             <span>Intereses proyectados:</span>
-            <span className="font-semibold text-rose-500">
+            <span className="font-semibold text-rose-500 tabular-nums">
               {formatoMoneda(simulacion.total_intereses_proyectados)}
             </span>
           </div>
@@ -221,12 +229,12 @@ export function DashboardWidgets({
 
       {/* Banner Foco Bola de Nieve */}
       {deudasConSaldo.length > 0 && primerDeudaPendiente && (
-        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-slate-700 dark:text-slate-300 shadow-sm animate-in fade-in duration-300">
+        <div className="p-4 rounded-2xl bg-[var(--brand-surface)] border border-[var(--brand-border)] text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[var(--text-secondary)] shadow-xs">
           <div className="flex items-start sm:items-center gap-3">
-            <Flame className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5 sm:mt-0" />
+            <Flame className="w-5 h-5 text-[var(--brand-primary)] shrink-0 mt-0.5 sm:mt-0" />
             <p className="leading-relaxed">
-              <strong>Foco Bola de Nieve:</strong> Tu objetivo activo inmediato es{' '}
-              <span className="font-extrabold text-emerald-600 dark:text-emerald-400">
+              <strong className="text-[var(--text-primary)]">Foco Bola de Nieve:</strong> Tu objetivo activo inmediato es{' '}
+              <span className="font-extrabold text-[var(--brand-primary)]">
                 {primerDeudaPendiente.nombre_tarjeta}
               </span>
               . Cubre los pagos mínimos de las demás y abona todo tu excedente a esta tarjeta. Al liquidarla, su pago mínimo se transferirá automáticamente a la siguiente deuda.
@@ -236,7 +244,7 @@ export function DashboardWidgets({
           {onGoToDeudas && (
             <button
               onClick={onGoToDeudas}
-              className="shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 border border-emerald-500/30 transition-all active:scale-95"
+              className="shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold text-[var(--brand-text)] bg-[var(--surface-card)] hover:bg-[var(--surface-subtle)] border border-[var(--brand-border)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
             >
               Ver Deudas →
             </button>

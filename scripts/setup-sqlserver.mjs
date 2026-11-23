@@ -17,7 +17,7 @@ if (!DB_PASSWORD) {
 }
 
 console.log(`🔌 Ejecutando setup de SQL Server en ${DB_SERVER} con usuario ${DB_USER}...`);
-const child = execFile(
+execFile(
   'sqlcmd',
   ['-S', DB_SERVER, '-U', DB_USER, '-P', DB_PASSWORD, '-C', '-i', sqlFile],
   { shell: false },

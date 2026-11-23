@@ -95,42 +95,35 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 sm:p-6 overflow-hidden bg-slate-950 text-slate-100">
-      {/* Background radial gradients */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[140px] pointer-events-none" />
-
+    <div className="min-h-screen relative flex items-center justify-center p-4 sm:p-6 bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors">
       {/* Top Bar with Theme Toggle */}
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
         <button
           onClick={toggleTheme}
           type="button"
           aria-label="Cambiar tema"
-          className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-700 backdrop-blur-md transition-all shadow-sm"
+          className="p-2.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] transition-all shadow-xs"
         >
-          {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
+          {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-700" />}
         </button>
       </div>
 
       <div className="w-full max-w-md relative z-10">
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold tracking-wide uppercase mb-3 shadow-sm backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--brand-surface)] border border-[var(--brand-border)] text-[var(--brand-text)] text-xs font-semibold tracking-wide uppercase mb-3 shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
             <span>Método Bola de Nieve</span>
           </div>
 
-          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-[1.5px] shadow-lg shadow-emerald-500/20">
-            <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-              <TrendingDown className="w-7 h-7 text-emerald-400" />
-            </div>
+          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-[var(--brand-primary)] flex items-center justify-center shadow-xs text-white">
+            <TrendingDown className="w-7 h-7 text-white" />
           </div>
 
-          <h1 className="text-2xl font-extrabold tracking-tight text-white mb-1">
+          <h1 className="text-2xl font-extrabold tracking-tight text-[var(--text-primary)] mb-1">
             Bola de Nieve
           </h1>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+          <p className="text-xs text-[var(--text-muted)] max-w-sm mx-auto">
             {mode === 'login'
               ? 'Control de deudas, cascada acelerada y libertad financiera.'
               : 'Comienza hoy tu plan acelerado para liquidar tus deudas.'}
@@ -138,16 +131,16 @@ export function LoginPage() {
         </div>
 
         {/* Card Form */}
-        <div className="bg-slate-900/85 backdrop-blur-xl border border-slate-800/90 rounded-2xl p-6 sm:p-7 shadow-2xl shadow-black/50">
+        <div className="bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-2xl p-6 sm:p-7 shadow-sm">
           {/* Selector de Pestañas Login / Registro */}
-          <div className="flex p-1 bg-slate-950/70 border border-slate-800 rounded-xl mb-5">
+          <div className="flex p-1 bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-xl mb-5">
             <button
               type="button"
               onClick={() => handleSwitchMode('login')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] ${
                 mode === 'login'
-                  ? 'bg-slate-800 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[var(--brand-primary)] text-white shadow-xs'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <LogIn className="w-3.5 h-3.5" />
@@ -156,10 +149,10 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => handleSwitchMode('register')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] ${
                 mode === 'register'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[var(--brand-primary)] text-white shadow-xs'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <UserPlus className="w-3.5 h-3.5" />
@@ -168,10 +161,10 @@ export function LoginPage() {
           </div>
 
           <div className="mb-4">
-            <h2 className="text-base font-bold text-slate-100">
+            <h2 className="text-base font-bold text-[var(--text-primary)]">
               {mode === 'login' ? 'Bienvenido de nuevo' : 'Crear nueva cuenta'}
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
               {mode === 'login'
                 ? 'Ingresa tus credenciales para acceder al simulador.'
                 : 'Registra tus datos para comenzar tu bitácora personalizada.'}
@@ -179,8 +172,8 @@ export function LoginPage() {
           </div>
 
           {errorMessage && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 text-rose-300 text-xs animate-in fade-in duration-200">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 text-rose-700 dark:text-rose-300 text-xs animate-in fade-in duration-200">
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -189,11 +182,11 @@ export function LoginPage() {
             {/* Campo Nombre Completo (Solo en modo Registro) */}
             {mode === 'register' && (
               <div className="animate-in fade-in slide-in-from-top-1 duration-200">
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
                   Nombre Completo
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
                     <User className="w-4 h-4" />
                   </div>
                   <input
@@ -203,7 +196,7 @@ export function LoginPage() {
                     placeholder="ej. Juan Pérez"
                     required
                     autoFocus
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-xl text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] transition-all"
                   />
                 </div>
               </div>
@@ -211,11 +204,11 @@ export function LoginPage() {
 
             {/* Campo Usuario / Correo */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
                 {mode === 'register' ? 'Correo Electrónico o Usuario' : 'Usuario o Correo'}
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
                   {mode === 'register' ? <Mail className="w-4 h-4" /> : <User className="w-4 h-4" />}
                 </div>
                 <input
@@ -225,32 +218,32 @@ export function LoginPage() {
                   placeholder={mode === 'register' ? 'correo@ejemplo.com' : 'ej. usuario o correo...'}
                   required
                   autoFocus={mode === 'login'}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-xl text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] transition-all"
                 />
               </div>
             </div>
 
             {/* Campo Contraseña */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
                 Contraseña
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={mode === 'register' ? 'Mínimo 6 caracteres' : '••••••••'}
+                  placeholder={mode === 'register' ? 'Mínimo 8 caracteres' : '••••••••'}
                   required
-                  className="w-full pl-10 pr-11 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-all"
+                  className="w-full pl-10 pr-11 py-2.5 bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-xl text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[var(--text-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] rounded transition-colors"
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -261,11 +254,11 @@ export function LoginPage() {
             {/* Campo Confirmar Contraseña (Solo en modo Registro) */}
             {mode === 'register' && (
               <div className="animate-in fade-in slide-in-from-top-1 duration-200">
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
                   Confirmar Contraseña
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
@@ -274,7 +267,7 @@ export function LoginPage() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repite tu contraseña"
                     required
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-xl text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] transition-all"
                   />
                 </div>
               </div>
@@ -283,12 +276,12 @@ export function LoginPage() {
             {/* Checkbox Recordar (Solo en Login) */}
             {mode === 'login' && (
               <div className="flex items-center justify-between pt-0.5 text-xs">
-                <label className="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-300 select-none">
+                <label className="flex items-center gap-2 cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-primary)] select-none">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded border-slate-700 bg-slate-950 text-emerald-500 focus:ring-emerald-500/30 focus:ring-offset-0 w-4 h-4"
+                    className="rounded border-[var(--border-subtle)] text-[var(--brand-primary)] focus-visible:ring-[var(--brand-primary)] w-4 h-4"
                   />
                   <span>Recordar sesión (30 días)</span>
                 </label>
@@ -299,7 +292,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 py-3 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2"
+              className="w-full mt-2 py-3 px-4 rounded-xl font-bold text-sm text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] active:scale-98 disabled:opacity-50 disabled:pointer-events-none transition-all shadow-xs flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
             >
               {isLoading ? (
                 <>
@@ -316,14 +309,14 @@ export function LoginPage() {
           </form>
 
           {/* Enlace para cambiar de modo al pie */}
-          <div className="mt-5 pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
+          <div className="mt-5 pt-4 border-t border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">
             {mode === 'login' ? (
               <p>
                 ¿No tienes una cuenta aún?{' '}
                 <button
                   type="button"
                   onClick={() => handleSwitchMode('register')}
-                  className="font-bold text-emerald-400 hover:text-emerald-300 hover:underline transition-colors"
+                  className="font-bold text-[var(--brand-primary)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] rounded transition-colors"
                 >
                   Regístrate aquí
                 </button>
@@ -334,7 +327,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => handleSwitchMode('login')}
-                  className="font-bold text-emerald-400 hover:text-emerald-300 hover:underline transition-colors"
+                  className="font-bold text-[var(--brand-primary)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] rounded transition-colors"
                 >
                   Inicia sesión
                 </button>
@@ -344,13 +337,13 @@ export function LoginPage() {
         </div>
 
         {/* Security badges */}
-        <div className="mt-6 flex items-center justify-center gap-6 text-[11px] text-slate-500">
+        <div className="mt-6 flex items-center justify-center gap-6 text-[11px] text-[var(--text-muted)]">
           <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
             <span>Cifrado BCrypt</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-cyan-500" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-teal-500" />
             <span>Base de Datos Segura</span>
           </div>
           <div className="flex items-center gap-1.5">

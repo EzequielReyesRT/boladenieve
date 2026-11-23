@@ -129,6 +129,12 @@ export async function authenticateUser(
   passwordPlain: string
 ): Promise<Usuario | null> {
   const cleanInput = usernameOrEmail.trim().toLowerCase();
+
+  // Validación estricta contra PostgREST Filter Injection y caracteres de control
+  if (!cleanInput || !/^[a-zA-Z0-9_.@+-]{1,120}$/.test(cleanInput)) {
+    return null;
+  }
+
   let user: UserRow | null = null;
 
   // 1. Intentar primero con Supabase si está configurado en producción/nube
@@ -201,6 +207,15 @@ export async function registerNewUser(
 ): Promise<{ user?: Usuario; error?: string }> {
   const cleanEmail = emailOrUsername.trim().toLowerCase();
   const cleanNombre = nombre.trim();
+
+  // Validación estricta contra inyección y caracteres no permitidos en identificador/correo
+  if (!cleanEmail || !/^[a-zA-Z0-9_.@+-]{3,120}$/.test(cleanEmail)) {
+    return { error: 'El correo o nombre de usuario contiene caracteres no válidos o longitud incorrecta.' };
+  }
+
+  if (!cleanNombre || cleanNombre.length < 2 || cleanNombre.length > 100) {
+    return { error: 'El nombre debe tener entre 2 y 100 caracteres.' };
+  }
 
   if (!passwordPlain || passwordPlain.length < 8) {
     return { error: 'La contraseña debe tener al menos 8 caracteres.' };

@@ -10,17 +10,20 @@ const rateLimitStore = new Map<string, RateLimitRecord>();
  * Obtiene la dirección IP del cliente a partir de los encabezados HTTP
  */
 export function getClientIp(request: Request): string {
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(',')[0].trim();
-    if (firstIp) return firstIp;
-  }
+  // 1. Cloudflare header prioritario (no manipulable por el cliente si el tráfico pasa por CF)
+  const cfIp = request.headers.get('cf-connecting-ip');
+  if (cfIp) return cfIp.trim();
 
+  // 2. Real IP de proxies intermedios configurados
   const realIp = request.headers.get('x-real-ip');
   if (realIp) return realIp.trim();
 
-  const cfIp = request.headers.get('cf-connecting-ip');
-  if (cfIp) return cfIp.trim();
+  // 3. X-Forwarded-For (tomar la última IP confiable si hay cadena o la primera)
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const ips = forwardedFor.split(',').map((ip) => ip.trim()).filter(Boolean);
+    if (ips.length > 0) return ips[0];
+  }
 
   return '127.0.0.1';
 }

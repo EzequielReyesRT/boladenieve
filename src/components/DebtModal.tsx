@@ -98,7 +98,7 @@ function DebtForm({
     <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+          <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
             Nombre de la Tarjeta o Crédito
           </label>
           <input
@@ -107,17 +107,17 @@ function DebtForm({
             value={nombreTarjeta}
             onChange={(e) => setNombreTarjeta(e.target.value)}
             required
-            className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
               Saldo Inicial ($)
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
+              <span className="absolute left-3.5 top-2.5 text-[var(--text-muted)] font-bold text-sm">$</span>
               <input
                 type="number"
                 step="0.01"
@@ -126,13 +126,13 @@ function DebtForm({
                 value={saldoInicial}
                 onChange={(e) => setSaldoInicial(e.target.value)}
                 required
-                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-semibold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] tabular-nums"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
               Tasa Anual de Interés (%)
             </label>
             <div className="relative">
@@ -145,19 +145,19 @@ function DebtForm({
                 value={tasaAnual}
                 onChange={(e) => setTasaAnual(e.target.value)}
                 required
-                className="w-full pl-3.5 pr-8 py-2.5 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-3.5 pr-8 py-2.5 rounded-xl text-sm font-semibold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] tabular-nums"
               />
-              <span className="absolute right-3.5 top-2.5 text-slate-400 font-bold text-sm">%</span>
+              <span className="absolute right-3.5 top-2.5 text-[var(--text-muted)] font-bold text-sm">%</span>
             </div>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+          <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
             Pago Mínimo Requerido Mensual ($)
           </label>
           <div className="relative">
-            <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
+            <span className="absolute left-3.5 top-2.5 text-[var(--text-muted)] font-bold text-sm">$</span>
             <input
               type="number"
               step="0.01"
@@ -166,21 +166,21 @@ function DebtForm({
               value={pagoMinimo}
               onChange={(e) => setPagoMinimo(e.target.value)}
               required
-              className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-semibold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] tabular-nums"
             />
           </div>
-          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-[11px] text-[var(--text-muted)]">
             Al liquidarse la deuda, este monto se liberará y alimentará a la siguiente tarjeta.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
               Costo de Anualidad ($)
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
+              <span className="absolute left-3.5 top-2.5 text-[var(--text-muted)] font-bold text-sm">$</span>
               <input
                 type="number"
                 step="0.01"
@@ -188,19 +188,19 @@ function DebtForm({
                 placeholder="0.00"
                 value={costoAnualidad}
                 onChange={(e) => setCostoAnualidad(e.target.value)}
-                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] tabular-nums"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
               Mes Cobro de Anualidad
             </label>
             <select
               value={mesAnualidad}
               onChange={(e) => setMesAnualidad(parseInt(e.target.value, 10))}
-              className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
             >
               {MESES.map((m) => (
                 <option key={m.val} value={m.val}>
@@ -213,18 +213,18 @@ function DebtForm({
       </div>
 
       {/* Footer fijo abajo con botones siempre visibles */}
-      <div className="px-4 py-3 sm:px-6 sm:py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm flex items-center justify-end gap-2.5 shrink-0">
+      <div className="px-4 py-3 sm:px-6 sm:py-3.5 border-t border-[var(--border-subtle)] bg-[var(--surface-subtle)] flex items-center justify-end gap-2.5 shrink-0">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+          className="px-4 py-2.5 text-xs font-semibold rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25 active:scale-95 disabled:opacity-50 transition-all"
+          className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white shadow-xs active:scale-95 disabled:opacity-50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
         >
           <Check className="w-4 h-4" />
           {isSubmitting ? 'Guardando...' : debtToEdit ? 'Actualizar' : 'Guardar Deuda'}
@@ -248,17 +248,17 @@ export function DebtModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col max-h-[90dvh] sm:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-200">
-        <div className="flex items-center justify-between px-5 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 z-10">
+      <div className="relative w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xl flex flex-col max-h-[90dvh] sm:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-200">
+        <div className="flex items-center justify-between px-5 py-3.5 sm:px-6 sm:py-4 border-b border-[var(--border-subtle)] shrink-0 bg-[var(--surface-card)] z-10">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center shrink-0">
               <CreditCard className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+              <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)] truncate">
                 {debtToEdit ? 'Editar Deuda / Tarjeta' : 'Agregar Nueva Deuda'}
               </h2>
-              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
+              <p className="text-[11px] sm:text-xs text-[var(--text-muted)] truncate">
                 Se ordenará automáticamente por menor saldo en la Bola de Nieve
               </p>
             </div>
@@ -266,7 +266,7 @@ export function DebtModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 -mr-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            className="p-2 -mr-1 rounded-xl text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
             title="Cerrar ventana"
             aria-label="Cerrar ventana"
           >

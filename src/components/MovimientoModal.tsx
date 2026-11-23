@@ -146,162 +146,162 @@ function MovimientoForm({
     <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
         {/* Switcher Ingreso / Gasto */}
-      <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700">
-        <button
-          type="button"
-          onClick={() => handleTipoChange('Ingreso')}
-          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
-            tipo === 'Ingreso'
-              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <ArrowUpCircle className="w-4 h-4" />
-          <span>Ingreso (+)</span>
-        </button>
+        <div className="grid grid-cols-2 gap-2 p-1 bg-[var(--surface-subtle)] rounded-xl border border-[var(--border-subtle)]">
+          <button
+            type="button"
+            onClick={() => handleTipoChange('Ingreso')}
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] ${
+              tipo === 'Ingreso'
+                ? 'bg-[var(--brand-primary)] text-white shadow-xs'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            <ArrowUpCircle className="w-4 h-4" />
+            <span>Ingreso (+)</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => handleTipoChange('Gasto')}
-          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
-            tipo === 'Gasto'
-              ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <ArrowDownCircle className="w-4 h-4" />
-          <span>Gasto (-)</span>
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => handleTipoChange('Gasto')}
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 ${
+              tipo === 'Gasto'
+                ? 'bg-rose-600 text-white shadow-xs'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            <ArrowDownCircle className="w-4 h-4" />
+            <span>Gasto (-)</span>
+          </button>
+        </div>
 
-      {/* Monto y Fecha */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-            <DollarSign className="w-3.5 h-3.5 text-slate-400" />
-            <span>Monto ($)</span>
-          </label>
-          <div className="relative">
-            <span className="absolute left-3.5 top-2.5 text-slate-400 font-bold text-sm">$</span>
+        {/* Monto y Fecha */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 flex items-center gap-1.5">
+              <DollarSign className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+              <span>Monto ($)</span>
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-2.5 text-[var(--text-muted)] font-bold text-sm">$</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                placeholder="0.00"
+                value={monto}
+                onChange={(e) => setMonto(e.target.value)}
+                required
+                autoFocus
+                className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-bold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] tabular-nums"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+              <span>Fecha</span>
+            </label>
             <input
-              type="number"
-              step="0.01"
-              min="0.01"
-              placeholder="0.00"
-              value={monto}
-              onChange={(e) => setMonto(e.target.value)}
+              type="date"
+              value={fecha}
+              onChange={(e) => setFecha(e.target.value)}
               required
-              autoFocus
-              className="w-full pl-8 pr-3.5 py-2.5 rounded-xl text-sm font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] font-medium"
             />
           </div>
         </div>
 
+        {/* Categoría */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-            <span>Fecha</span>
+          <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 flex items-center gap-1.5">
+            <Tag className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+            <span>Categoría</span>
+          </label>
+          <select
+            value={categoria}
+            onChange={(e) => setCategoria(e.target.value)}
+            className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] font-medium"
+          >
+            {categoriasActuales.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+          {/* Chips de acceso rápido */}
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {categoriasActuales.slice(0, 4).map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategoria(cat)}
+                className={`text-[11px] px-2 py-0.5 rounded-md border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95 ${
+                  categoria === cat
+                    ? tipo === 'Ingreso'
+                      ? 'bg-[var(--brand-surface)] border-[var(--brand-border)] text-[var(--brand-text)] font-semibold'
+                      : 'bg-rose-500/15 border-rose-500/40 text-rose-600 dark:text-rose-400 font-semibold'
+                    : 'bg-[var(--surface-subtle)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Descripción */}
+        <div>
+          <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 flex items-center gap-1.5">
+            <FileText className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+            <span>Descripción</span>
           </label>
           <input
-            type="date"
-            value={fecha}
-            onChange={(e) => setFecha(e.target.value)}
+            type="text"
+            placeholder={
+              tipo === 'Ingreso'
+                ? 'Ej. Sueldo primera quincena, Venta en tienda...'
+                : 'Ej. Renta departamento, Despensa de la semana, Pago de CFE...'
+            }
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
             required
-            className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
+            className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
           />
+        </div>
+
+        {/* Es Recurrente */}
+        <div className="pt-1">
+          <label className="flex items-center gap-2 cursor-pointer text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] select-none">
+            <input
+              type="checkbox"
+              checked={esRecurrente}
+              onChange={(e) => setEsRecurrente(e.target.checked)}
+              className="rounded border-[var(--border-subtle)] text-[var(--brand-primary)] focus-visible:ring-[var(--brand-primary)] w-4 h-4"
+            />
+            <Repeat className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+            <span>Movimiento recurrente fijo (mensual / quincenal)</span>
+          </label>
         </div>
       </div>
 
-      {/* Categoría */}
-      <div>
-        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-          <Tag className="w-3.5 h-3.5 text-slate-400" />
-          <span>Categoría</span>
-        </label>
-        <select
-          value={categoria}
-          onChange={(e) => setCategoria(e.target.value)}
-          className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
-        >
-          {categoriasActuales.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-
-        {/* Chips de acceso rápido */}
-        <div className="flex flex-wrap gap-1.5 mt-2">
-          {categoriasActuales.slice(0, 4).map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setCategoria(cat)}
-              className={`text-[11px] px-2 py-0.5 rounded-md border transition-colors ${
-                categoria === cat
-                  ? tipo === 'Ingreso'
-                    ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-semibold'
-                    : 'bg-rose-500/15 border-rose-500/40 text-rose-600 dark:text-rose-400 font-semibold'
-                  : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Descripción */}
-      <div>
-        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-          <FileText className="w-3.5 h-3.5 text-slate-400" />
-          <span>Descripción</span>
-        </label>
-        <input
-          type="text"
-          placeholder={
-            tipo === 'Ingreso'
-              ? 'Ej. Sueldo primera quincena, Venta en tienda...'
-              : 'Ej. Renta departamento, Despensa de la semana, Pago de CFE...'
-          }
-          value={descripcion}
-          onChange={(e) => setDescripcion(e.target.value)}
-          required
-          className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-        />
-      </div>
-
-      {/* Es Recurrente */}
-      <div className="pt-1">
-        <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white select-none">
-          <input
-            type="checkbox"
-            checked={esRecurrente}
-            onChange={(e) => setEsRecurrente(e.target.checked)}
-            className="rounded border-slate-300 dark:border-slate-700 text-emerald-600 focus:ring-emerald-500/30 w-4 h-4"
-          />
-          <Repeat className="w-3.5 h-3.5 text-slate-400" />
-          <span>Movimiento recurrente fijo (mensual / quincenal)</span>
-        </label>
-      </div>
-    </div>
-
-    {/* Footer fijo con botones */}
-      <div className="px-4 py-3 sm:px-6 sm:py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm flex items-center justify-end gap-2.5 shrink-0">
+      {/* Footer fijo con botones */}
+      <div className="px-4 py-3 sm:px-6 sm:py-3.5 border-t border-[var(--border-subtle)] bg-[var(--surface-subtle)] flex items-center justify-end gap-2.5 shrink-0">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2.5 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+          className="px-4 py-2.5 text-xs font-semibold rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl text-white shadow-lg active:scale-95 disabled:opacity-50 transition-all ${
+          className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl text-white shadow-xs active:scale-95 disabled:opacity-50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
             tipo === 'Ingreso'
-              ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/25'
-              : 'bg-rose-600 hover:bg-rose-500 shadow-rose-600/25'
+              ? 'bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] focus-visible:ring-[var(--brand-primary)]'
+              : 'bg-rose-600 hover:bg-rose-500 focus-visible:ring-rose-500'
           }`}
         >
           <Check className="w-4 h-4" />
@@ -333,17 +333,17 @@ export function MovimientoModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col max-h-[90dvh] sm:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-200">
-        <div className="flex items-center justify-between px-5 py-3.5 sm:px-6 sm:py-4 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 z-10">
+      <div className="relative w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xl flex flex-col max-h-[90dvh] sm:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-200">
+        <div className="flex items-center justify-between px-5 py-3.5 sm:px-6 sm:py-4 border-b border-[var(--border-subtle)] shrink-0 bg-[var(--surface-card)] z-10">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center shrink-0">
               <PlusCircle className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+              <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)] truncate">
                 {movimientoToEdit ? 'Editar Movimiento' : 'Registrar Ingreso o Gasto'}
               </h2>
-              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
+              <p className="text-[11px] sm:text-xs text-[var(--text-muted)] truncate">
                 Flujo de caja para determinar tu excedente de Bola de Nieve
               </p>
             </div>
@@ -351,7 +351,7 @@ export function MovimientoModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 -mr-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            className="p-2 -mr-1 rounded-xl text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
             title="Cerrar ventana"
             aria-label="Cerrar ventana"
           >

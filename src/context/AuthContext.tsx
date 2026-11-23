@@ -22,15 +22,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = useCallback(async () => {
     try {
       const res = await fetch('/api/auth/me', {
-        headers: { 'Cache-Control': 'no-cache' }
+        headers: { 'Cache-Control': 'no-cache' },
       });
       if (res.ok) {
         const data = await res.json();
-        if (data.authenticated && data.user) {
-          setUser(data.user);
-        } else {
-          setUser(null);
-        }
+        setUser(data.authenticated && data.user ? data.user : null);
       } else {
         setUser(null);
       }
@@ -42,8 +38,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    let isMounted = true;
+
+    async function initializeAuth() {
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Cache-Control': 'no-cache' },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted) {
+            setUser(data.authenticated && data.user ? data.user : null);
+          }
+        } else if (isMounted) {
+          setUser(null);
+        }
+      } catch {
+        if (isMounted) {
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    initializeAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const login = async (username: string, password: string, rememberMe = true) => {
     setIsLoading(true);

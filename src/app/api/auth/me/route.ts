@@ -4,7 +4,7 @@ import { verifyToken, COOKIE_NAME } from '@/lib/auth';
 import { getDb } from '@/lib/db';
 import { UserRow } from '@/lib/auth';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(COOKIE_NAME)?.value;

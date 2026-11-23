@@ -16,24 +16,24 @@ interface PaymentHistoryTableProps {
 
 const BADGE_COLORS: Record<TipoPago, { bg: string; text: string; border: string }> = {
   Extra: {
-    bg: 'bg-emerald-100 dark:bg-emerald-950/60',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
     text: 'text-emerald-700 dark:text-emerald-300',
-    border: 'border-emerald-300/50 dark:border-emerald-800',
+    border: 'border-emerald-200 dark:border-emerald-800/60',
   },
   Minimo: {
-    bg: 'bg-slate-100 dark:bg-slate-800',
+    bg: 'bg-slate-100 dark:bg-slate-800/70',
     text: 'text-slate-700 dark:text-slate-300',
-    border: 'border-slate-300/50 dark:border-slate-700',
+    border: 'border-slate-200 dark:border-slate-700',
   },
   Liquidacion: {
-    bg: 'bg-purple-100 dark:bg-purple-950/60',
+    bg: 'bg-purple-50 dark:bg-purple-950/40',
     text: 'text-purple-700 dark:text-purple-300',
-    border: 'border-purple-300/50 dark:border-purple-800',
+    border: 'border-purple-200 dark:border-purple-800/60',
   },
   Anualidad: {
-    bg: 'bg-amber-100 dark:bg-amber-950/60',
+    bg: 'bg-amber-50 dark:bg-amber-950/40',
     text: 'text-amber-700 dark:text-amber-300',
-    border: 'border-amber-300/50 dark:border-amber-800',
+    border: 'border-amber-200 dark:border-amber-800/60',
   },
 };
 
@@ -43,6 +43,7 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
   const [filterTipo, setFilterTipo] = useState<string>('all');
 
   const deudaMap = new Map(deudas.map((d) => [d.id, d.nombre_tarjeta]));
+  const hasActiveFilters = filterDeudaId !== 'all' || filterTipo !== 'all';
 
   const filteredPagos = bitacora.filter((p) => {
     if (filterDeudaId !== 'all' && p.deuda_id !== filterDeudaId) return false;
@@ -57,17 +58,18 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
   return (
     <div className="space-y-4">
       {/* Barra de cabecera con filtros y acción */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center font-bold">
             <Receipt className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">
               Historial de Pagos y Abonos
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {filteredPagos.length} {filteredPagos.length === 1 ? 'registro' : 'registros'} en la bitácora
+            <p className="text-xs text-[var(--text-muted)]">
+              <span className="tabular-nums font-semibold">{filteredPagos.length}</span>{' '}
+              {filteredPagos.length === 1 ? 'registro' : 'registros'} en la bitácora
             </p>
           </div>
         </div>
@@ -77,7 +79,7 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
           <select
             value={filterDeudaId}
             onChange={(e) => setFilterDeudaId(e.target.value)}
-            className="text-xs px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="text-xs px-3 py-2 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
           >
             <option value="all">Todas las tarjetas</option>
             {deudas.map((d) => (
@@ -91,7 +93,7 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
           <select
             value={filterTipo}
             onChange={(e) => setFilterTipo(e.target.value)}
-            className="text-xs px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="text-xs px-3 py-2 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
           >
             <option value="all">Todos los tipos</option>
             <option value="Extra">Pago Extra</option>
@@ -100,10 +102,23 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
             <option value="Anualidad">Anualidad</option>
           </select>
 
+          {/* Botón limpiar filtros si hay alguno activo */}
+          {hasActiveFilters && (
+            <button
+              onClick={() => {
+                setFilterDeudaId('all');
+                setFilterTipo('all');
+              }}
+              className="text-xs px-3 py-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] border border-[var(--border-subtle)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
+            >
+              Restablecer
+            </button>
+          )}
+
           {/* Botón registrar */}
           <button
             onClick={onOpenPaymentModal}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition-all active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-95"
           >
             <PlusCircle className="w-4 h-4" />
             Nuevo Abono
@@ -113,47 +128,72 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
 
       {/* Mini resumen de la bitácora filtrada */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">
+        <div className="p-3.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+          <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
             Total Desembolsado
           </span>
-          <div className="text-lg font-black text-slate-900 dark:text-white">
+          <div className="text-lg font-black text-[var(--text-primary)] tabular-nums mt-0.5">
             {formatoMoneda(totalMontoFiltrado)}
           </div>
         </div>
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">
+        <div className="p-3.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+          <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
             Intereses Absorbidos
           </span>
-          <div className="text-lg font-black text-rose-500">
+          <div className="text-lg font-black text-rose-500 tabular-nums mt-0.5">
             {formatoMoneda(totalInteresesFiltrado)}
           </div>
         </div>
-        <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">
+        <div className="p-3.5 rounded-xl bg-[var(--surface-card)] border border-[var(--border-subtle)]">
+          <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
             Amortización Real al Capital
           </span>
-          <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">
+          <div className="text-lg font-black text-[var(--brand-primary)] tabular-nums mt-0.5">
             {formatoMoneda(totalAmortizadoFiltrado)}
           </div>
         </div>
       </div>
 
       {/* Tabla Responsiva */}
-      <div className="overflow-x-auto rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="overflow-x-auto rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs">
         {filteredPagos.length === 0 ? (
-          <div className="text-center py-12 px-4">
-            <Receipt className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">
-              No hay pagos registrados con estos filtros
+          <div className="text-center py-12 px-4 max-w-sm mx-auto">
+            <div className="w-12 h-12 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)] flex items-center justify-center mx-auto mb-3 text-[var(--text-muted)]">
+              <Receipt className="w-6 h-6" />
+            </div>
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">
+              {hasActiveFilters ? 'Sin resultados con estos filtros' : 'Bitácora sin pagos registrados'}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Registra un pago para comenzar a ver el progreso real.
+            <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-relaxed">
+              {hasActiveFilters
+                ? 'Prueba restableciendo los filtros para ver todos los movimientos registrados.'
+                : 'Registra un pago para comenzar a visualizar la amortización y el ahorro en intereses.'}
             </p>
+            <div className="mt-4 flex justify-center gap-2">
+              {hasActiveFilters ? (
+                <button
+                  onClick={() => {
+                    setFilterDeudaId('all');
+                    setFilterTipo('all');
+                  }}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-[var(--surface-subtle)] hover:bg-[var(--surface-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
+                >
+                  Restablecer filtros
+                </button>
+              ) : (
+                <button
+                  onClick={onOpenPaymentModal}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-95"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  Registrar Primer Abono
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
+            <thead className="bg-[var(--surface-subtle)] border-b border-[var(--border-subtle)] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
               <tr>
                 <th className="py-3 px-4">Fecha</th>
                 <th className="py-3 px-4">Tarjeta</th>
@@ -165,7 +205,7 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
                 <th className="py-3 px-4 text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+            <tbody className="divide-y divide-[var(--border-subtle)]">
               {filteredPagos.map((pago) => {
                 const nombre = deudaMap.get(pago.deuda_id) || 'Tarjeta eliminada';
                 const amort = Math.max(0, pago.monto_total - pago.intereses_cobrados);
@@ -174,32 +214,32 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
                 return (
                   <tr
                     key={pago.id}
-                    className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
+                    className="hover:bg-[var(--surface-subtle)] transition-colors"
                   >
-                    <td className="py-3.5 px-4 font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                    <td className="py-3.5 px-4 font-medium text-[var(--text-secondary)] whitespace-nowrap tabular-nums">
                       {pago.fecha_pago}
                     </td>
-                    <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                    <td className="py-3.5 px-4 font-bold text-[var(--text-primary)]">
                       {nombre}
                     </td>
                     <td className="py-3.5 px-4">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.bg} ${badge.text} ${badge.border}`}
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${badge.bg} ${badge.text} ${badge.border}`}
                       >
                         {pago.tipo_pago}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-right font-black text-slate-900 dark:text-white">
+                    <td className="py-3.5 px-4 text-right font-black text-[var(--text-primary)] tabular-nums">
                       {formatoMoneda(pago.monto_total)}
                     </td>
-                    <td className="py-3.5 px-4 text-right font-semibold text-rose-500">
+                    <td className="py-3.5 px-4 text-right font-semibold text-rose-500 tabular-nums">
                       {pago.intereses_cobrados > 0 ? formatoMoneda(pago.intereses_cobrados) : '-'}
                     </td>
-                    <td className="py-3.5 px-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
+                    <td className="py-3.5 px-4 text-right font-bold text-[var(--brand-primary)] tabular-nums">
                       {formatoMoneda(amort)}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 max-w-[150px] truncate">
-                      {pago.folio_comprobante || <span className="text-slate-400 italic">Sin folio</span>}
+                    <td className="py-3.5 px-4 text-[var(--text-muted)] max-w-[150px] truncate">
+                      {pago.folio_comprobante || <span className="text-[var(--text-muted)] opacity-60 italic">Sin folio</span>}
                     </td>
                     <td className="py-3.5 px-4 text-center">
                       <button
@@ -209,7 +249,8 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
                           }
                         }}
                         title="Eliminar registro"
-                        className="p-1 rounded text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                        aria-label={`Eliminar pago de ${formatoMoneda(pago.monto_total)}`}
+                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 active:scale-95 transition-all"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

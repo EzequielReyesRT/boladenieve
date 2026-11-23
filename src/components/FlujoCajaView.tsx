@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useSnowball } from '@/context/SnowballContext';
-import { MovimientoFlujo, TipoMovimiento, DeudaConSaldoActual } from '@/types';
+import { MovimientoFlujo, TipoMovimiento } from '@/types';
 import { formatoMoneda } from '@/lib/snowball-engine';
 import {
   Wallet,
@@ -10,15 +10,12 @@ import {
   ArrowDownCircle,
   CreditCard,
   Sparkles,
-  Plus,
   PlusCircle,
   MinusCircle,
   Search,
-  Filter,
   Calendar,
   Trash2,
   Edit2,
-  TrendingUp,
   Zap,
   ArrowRight,
   Repeat,
@@ -55,15 +52,15 @@ export function FlujoCajaView({
     movimientosFlujo,
     deleteMovimientoFlujo,
     deudasConSaldo,
-    simulacion,
   } = useSnowball();
 
-  // Fecha seleccionada para filtros (inicializada estática para compatibilidad con SSR)
+  // Fecha seleccionada para filtros (inicializada estática y sincronizada en cliente para evitar new Date() en prerender)
   const [mesSeleccionado, setMesSeleccionado] = useState<number>(11);
   const [anioSeleccionado, setAnioSeleccionado] = useState<number>(2026);
 
   React.useEffect(() => {
     const hoy = new Date();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Sincronizacion de fecha en cliente para Next.js 16 prerender
     setMesSeleccionado(hoy.getMonth() + 1);
     setAnioSeleccionado(hoy.getFullYear());
   }, []);
@@ -140,18 +137,17 @@ export function FlujoCajaView({
   return (
     <div className="space-y-6">
       {/* 1. Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-emerald-950/80 to-slate-900 border border-slate-800 p-6 sm:p-8 shadow-xl">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-slate-900 dark:bg-[var(--surface-card)] border border-slate-800 dark:border-[var(--border-subtle)] p-6 sm:p-8 shadow-xs">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold tracking-wide uppercase mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold tracking-wide uppercase mb-3">
               <Scale className="w-3.5 h-3.5 text-emerald-400" />
               <span>Presupuesto y Flujo de Caja</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white dark:text-[var(--text-primary)] tracking-tight">
               Ingresos, Gastos y Excedente
             </h1>
-            <p className="text-sm text-slate-300 max-w-2xl mt-1">
+            <p className="text-sm text-slate-300 dark:text-[var(--text-secondary)] max-w-2xl mt-1 leading-relaxed">
               Tu flujo de caja determina cuánto dinero libre tienes cada mes para acelerar la liquidación de tus tarjetas en cascada.
             </p>
           </div>
@@ -159,7 +155,7 @@ export function FlujoCajaView({
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => onOpenNewMovimiento('Ingreso')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/30 active:scale-95 transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white text-xs font-bold shadow-xs active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Registrar Ingreso</span>
@@ -167,7 +163,7 @@ export function FlujoCajaView({
 
             <button
               onClick={() => onOpenNewMovimiento('Gasto')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-white text-xs font-bold shadow-md shadow-rose-600/20 active:scale-95 transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-xs active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2"
             >
               <MinusCircle className="w-4 h-4" />
               <span>Registrar Gasto</span>
@@ -177,16 +173,16 @@ export function FlujoCajaView({
       </div>
 
       {/* 2. Selector de Período (Mes y Año) */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs">
         <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-emerald-500" />
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+          <Calendar className="w-4 h-4 text-[var(--brand-primary)]" />
+          <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
             Período:
           </span>
           <select
             value={mesSeleccionado}
             onChange={(e) => setMesSeleccionado(parseInt(e.target.value, 10))}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
           >
             {NOMBRES_MESES.map((nombre, idx) => (
               <option key={idx + 1} value={idx + 1}>
@@ -197,7 +193,7 @@ export function FlujoCajaView({
           <select
             value={anioSeleccionado}
             onChange={(e) => setAnioSeleccionado(parseInt(e.target.value, 10))}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
           >
             {[2025, 2026, 2027, 2028].map((y) => (
               <option key={y} value={y}>
@@ -207,46 +203,46 @@ export function FlujoCajaView({
           </select>
         </div>
 
-        <div className="text-xs text-slate-500 dark:text-slate-400">
+        <div className="text-xs text-[var(--text-muted)]">
           <span>Movimientos registrados en {NOMBRES_MESES[mesSeleccionado - 1]}: </span>
-          <strong className="text-slate-900 dark:text-white">{movimientosDelMes.length}</strong>
+          <strong className="text-[var(--text-primary)] tabular-nums">{movimientosDelMes.length}</strong>
         </div>
       </div>
 
       {/* 3. Cuatro Widgets Clave de Métricas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Ingresos Totales */}
-        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+        <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-5 shadow-xs">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
               Total Ingresos
             </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center">
               <ArrowUpCircle className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          <div className="text-2xl font-black text-[var(--brand-primary)] tracking-tight tabular-nums">
             {formatoMoneda(totalIngresos)}
           </div>
-          <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-semibold">
+          <p className="mt-1 text-xs text-[var(--brand-primary)] flex items-center gap-1 font-semibold">
             <span>Entrada total del mes</span>
           </p>
         </div>
 
         {/* Card 2: Gastos Totales */}
-        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+        <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-5 shadow-xs">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
               Gastos del Mes
             </span>
-            <div className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center">
               <ArrowDownCircle className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          <div className="text-2xl font-black text-[var(--text-primary)] tracking-tight tabular-nums">
             {formatoMoneda(totalGastos)}
           </div>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
+          <p className="mt-1 text-xs text-[var(--text-muted)] font-medium tabular-nums">
             {pagosRealesTarjetas > 0
               ? `Vida: ${formatoMoneda(gastosVida)} • Tarjetas: ${formatoMoneda(pagosRealesTarjetas)}`
               : `Renta, despensa, etc. (${pctGastosVida}% del ingreso)`}
@@ -254,21 +250,21 @@ export function FlujoCajaView({
         </div>
 
         {/* Card 3: Compromiso Mínimo de Deudas */}
-        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+        <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-5 shadow-xs">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
               Mínimos de Tarjetas
             </span>
-            <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center">
               <CreditCard className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          <div className="text-2xl font-black text-[var(--text-primary)] tracking-tight tabular-nums">
             {formatoMoneda(compromisoMinimosDeuda)}
           </div>
-          <p className="mt-1 text-xs font-semibold">
+          <p className="mt-1 text-xs font-semibold tabular-nums">
             {pagosRealesTarjetas >= compromisoMinimosDeuda && compromisoMinimosDeuda > 0 ? (
-              <span className="text-emerald-600 dark:text-emerald-400">
+              <span className="text-[var(--brand-primary)]">
                 ✓ Mínimos cubiertos ({formatoMoneda(pagosRealesTarjetas)} pagados)
               </span>
             ) : pagosRealesTarjetas > 0 ? (
@@ -285,29 +281,29 @@ export function FlujoCajaView({
 
         {/* Card 4: Flujo Libre / Excedente Bola de Nieve */}
         <div
-          className={`relative overflow-hidden rounded-2xl p-5 shadow-sm border ${
+          className={`relative overflow-hidden rounded-2xl p-5 shadow-xs border ${
             flujoNetoExcedente > 0
-              ? 'bg-gradient-to-br from-emerald-950/50 via-slate-900 to-slate-900 border-emerald-500/40 text-white shadow-emerald-950/20'
-              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
+              ? 'bg-[var(--brand-surface)] border-[var(--brand-border)]'
+              : 'bg-[var(--surface-card)] border-[var(--border-subtle)]'
           }`}
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-[var(--brand-primary)] flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Excedente Libre</span>
             </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center">
               <Zap className="w-4 h-4" />
             </div>
           </div>
           <div
-            className={`text-2xl font-black tracking-tight ${
-              flujoNetoExcedente >= 0 ? 'text-emerald-400' : 'text-rose-500'
+            className={`text-2xl font-black tracking-tight tabular-nums ${
+              flujoNetoExcedente >= 0 ? 'text-[var(--brand-primary)]' : 'text-rose-500'
             }`}
           >
             {formatoMoneda(flujoNetoExcedente)}
           </div>
-          <p className="mt-1 text-xs text-slate-400 font-medium">
+          <p className="mt-1 text-xs text-[var(--text-muted)] font-medium">
             {flujoNetoExcedente > 0
               ? '¡Dinero listo para amortizar deudas!'
               : totalIngresos === 0
@@ -319,7 +315,7 @@ export function FlujoCajaView({
           {flujoNetoExcedente > 0 && deudaObjetivoActual && (
             <button
               onClick={() => onOpenPaymentModalWithSurplus(flujoNetoExcedente)}
-              className="mt-3 w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 hover:bg-emerald-400 active:scale-95 transition-all shadow-sm"
+              className="mt-3 w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-bold bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)] active:scale-95 transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
             >
               <span>Abonar a {deudaObjetivoActual.nombre_tarjeta}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -330,17 +326,17 @@ export function FlujoCajaView({
 
       {/* 4. Barra de Distribución del Ingreso */}
       {totalIngresos > 0 && (
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div className="p-5 rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs space-y-3">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-slate-700 dark:text-slate-300">
-              Distribución de tu Ingreso Mensual ({formatoMoneda(totalIngresos)})
+            <span className="font-bold text-[var(--text-primary)]">
+              Distribución de tu Ingreso Mensual (<span className="tabular-nums">{formatoMoneda(totalIngresos)}</span>)
             </span>
-            <span className="text-slate-500 font-medium">
-              Tasa de ahorro/excedente: <strong className="text-emerald-500">{pctExcedente}%</strong>
+            <span className="text-[var(--text-muted)] font-medium">
+              Tasa de ahorro/excedente: <strong className="text-[var(--brand-primary)] tabular-nums">{pctExcedente}%</strong>
             </span>
           </div>
 
-          <div className="h-3 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden flex">
+          <div className="h-3 w-full rounded-full bg-[var(--surface-subtle)] border border-[var(--border-subtle)] overflow-hidden flex">
             {/* Gastos de Vida */}
             <div
               style={{ width: `${pctGastosVida}%` }}
@@ -356,7 +352,7 @@ export function FlujoCajaView({
             {/* Excedente Libre */}
             <div
               style={{ width: `${pctExcedente}%` }}
-              className="bg-emerald-500 h-full transition-all duration-500"
+              className="bg-[var(--brand-primary)] h-full transition-all duration-500"
               title={`Excedente libre: ${pctExcedente}%`}
             />
           </div>
@@ -364,20 +360,20 @@ export function FlujoCajaView({
           <div className="flex flex-wrap items-center gap-4 text-xs pt-1">
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-              <span className="text-slate-600 dark:text-slate-400">
-                Gastos de Vida: <strong>{pctGastosVida}%</strong> ({formatoMoneda(gastosVida)})
+              <span className="text-[var(--text-secondary)]">
+                Gastos de Vida: <strong className="tabular-nums">{pctGastosVida}%</strong> (<span className="tabular-nums">{formatoMoneda(gastosVida)}</span>)
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
-              <span className="text-slate-600 dark:text-slate-400">
-                Abonos a Tarjetas: <strong>{pctTarjetas}%</strong> ({formatoMoneda(pagosRealesTarjetas)})
+              <span className="text-[var(--text-secondary)]">
+                Abonos a Tarjetas: <strong className="tabular-nums">{pctTarjetas}%</strong> (<span className="tabular-nums">{formatoMoneda(pagosRealesTarjetas)}</span>)
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-              <span className="text-slate-600 dark:text-slate-400">
-                Excedente Libre: <strong>{pctExcedente}%</strong> ({formatoMoneda(Math.max(0, flujoNetoExcedente))})
+              <span className="w-2.5 h-2.5 rounded-full bg-[var(--brand-primary)]" />
+              <span className="text-[var(--text-secondary)]">
+                Excedente Libre: <strong className="tabular-nums">{pctExcedente}%</strong> (<span className="tabular-nums">{formatoMoneda(Math.max(0, flujoNetoExcedente))}</span>)
               </span>
             </div>
           </div>
@@ -385,23 +381,23 @@ export function FlujoCajaView({
       )}
 
       {/* 5. Tabla / Lista de Movimientos */}
-      <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div className="rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs overflow-hidden">
         {/* Controles de filtro y búsqueda */}
-        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="p-4 border-b border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3">
           {/* Tabs Todos / Ingresos / Gastos */}
-          <div className="flex p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+          <div className="flex p-1 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)] w-full sm:w-auto">
             {(['Todos', 'Ingreso', 'Gasto'] as const).map((tipo) => (
               <button
                 key={tipo}
                 onClick={() => setFiltroTipo(tipo)}
-                className={`flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] ${
                   filtroTipo === tipo
                     ? tipo === 'Ingreso'
-                      ? 'bg-emerald-600 text-white shadow-sm'
+                      ? 'bg-[var(--brand-primary)] text-white shadow-xs'
                       : tipo === 'Gasto'
-                      ? 'bg-rose-600 text-white shadow-sm'
-                      : 'bg-slate-900 dark:bg-slate-700 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-rose-600 text-white shadow-xs'
+                      : 'bg-slate-900 dark:bg-slate-800 text-white shadow-xs'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]'
                 }`}
               >
                 {tipo === 'Todos' ? 'Todos los Movimientos' : `${tipo}s`}
@@ -411,7 +407,7 @@ export function FlujoCajaView({
 
           {/* Campo de Búsqueda */}
           <div className="relative w-full sm:w-64">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--text-muted)]">
               <Search className="w-3.5 h-3.5" />
             </div>
             <input
@@ -419,7 +415,7 @@ export function FlujoCajaView({
               placeholder="Buscar por descripción o categoría..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-9 pr-3 py-1.5 rounded-xl text-xs bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
             />
           </div>
         </div>
@@ -427,32 +423,32 @@ export function FlujoCajaView({
         {/* Lista o Tabla de Movimientos */}
         {movimientosFiltrados.length === 0 ? (
           <div className="text-center py-12 px-4">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+            <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)]">
               <Wallet className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">
               No hay movimientos en este período
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
+            <p className="text-xs text-[var(--text-muted)] max-w-sm mx-auto mt-1 leading-relaxed">
               Comienza registrando tu nómina, ventas o gastos de vivienda para calcular tu excedente disponible.
             </p>
             <div className="mt-4 flex items-center justify-center gap-2">
               <button
                 onClick={() => onOpenNewMovimiento('Ingreso')}
-                className="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow-sm"
+                className="px-3.5 py-1.5 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white text-xs font-bold shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
               >
                 + Registrar Ingreso
               </button>
               <button
                 onClick={() => onOpenNewMovimiento('Gasto')}
-                className="px-3.5 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold"
+                className="px-3.5 py-1.5 rounded-xl bg-[var(--surface-subtle)] hover:bg-[var(--surface-muted)] text-[var(--text-primary)] border border-[var(--border-subtle)] text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 active:scale-95"
               >
                 + Registrar Gasto
               </button>
             </div>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
+          <div className="divide-y divide-[var(--border-subtle)]">
             {movimientosFiltrados.map((mov) => {
               const esIngreso = mov.tipo === 'Ingreso';
               const esAbonoTarjeta =
@@ -461,16 +457,16 @@ export function FlujoCajaView({
               return (
                 <div
                   key={mov.id}
-                  className="p-4 flex items-center justify-between gap-3 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                  className="p-4 flex items-center justify-between gap-3 hover:bg-[var(--surface-subtle)] transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                         esIngreso
-                          ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400'
+                          ? 'bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)]'
                           : esAbonoTarjeta
-                          ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400'
-                          : 'bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400'
+                          ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20'
+                          : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
                       }`}
                     >
                       {esIngreso ? (
@@ -484,13 +480,13 @@ export function FlujoCajaView({
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                        <span className="text-sm font-bold text-[var(--text-primary)] truncate">
                           {mov.descripcion}
                         </span>
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 ${
                             esIngreso
-                              ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20'
+                              ? 'bg-[var(--brand-surface)] text-[var(--brand-text)] border border-[var(--brand-border)]'
                               : esAbonoTarjeta
                               ? 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20'
                               : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20'
@@ -500,18 +496,18 @@ export function FlujoCajaView({
                           {mov.categoria}
                         </span>
                         {esAbonoTarjeta && (
-                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/50">
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
                             Bitácora
                           </span>
                         )}
                         {mov.es_recurrente && (
-                          <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                          <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
                             <Repeat className="w-2.5 h-2.5" />
                             <span>Fijo</span>
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <p className="text-xs text-[var(--text-muted)] mt-0.5 tabular-nums">
                         {mov.fecha}
                       </p>
                     </div>
@@ -520,9 +516,9 @@ export function FlujoCajaView({
                   <div className="flex items-center gap-3 shrink-0">
                     <div className="text-right">
                       <div
-                        className={`text-sm sm:text-base font-extrabold ${
+                        className={`text-sm sm:text-base font-extrabold tabular-nums ${
                           esIngreso
-                            ? 'text-emerald-600 dark:text-emerald-400'
+                            ? 'text-[var(--brand-primary)]'
                             : esAbonoTarjeta
                             ? 'text-indigo-600 dark:text-indigo-400'
                             : 'text-rose-600 dark:text-rose-400'
@@ -536,14 +532,14 @@ export function FlujoCajaView({
                       {esAbonoTarjeta ? (
                         <span
                           title="Registrado automáticamente desde la Bitácora de Pagos. Se administra desde la pestaña Pagos y Deudas."
-                          className="p-1.5 rounded-lg text-slate-300 dark:text-slate-600 cursor-not-allowed"
+                          className="p-1.5 rounded-lg text-[var(--text-muted)] opacity-40 cursor-not-allowed"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </span>
                       ) : (
                         <button
                           onClick={() => onEditMovimiento(mov)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                          className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
                           title="Editar movimiento"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -558,7 +554,7 @@ export function FlujoCajaView({
                             deleteMovimientoFlujo(mov.id);
                           }
                         }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 active:scale-95"
                         title="Eliminar movimiento"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

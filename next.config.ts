@@ -40,6 +40,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['mssql', 'tedious', '@electric-sql/pglite'],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

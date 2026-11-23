@@ -46,12 +46,12 @@ function CustomTooltipContent({ active, payload, label, meses }: TooltipProps) {
   if (active && payload && payload.length) {
     const mesData = meses.find((m) => m.fecha_etiqueta === label);
     return (
-      <div className="rounded-xl bg-slate-900/95 p-3.5 shadow-2xl border border-slate-700 text-white text-xs max-w-xs">
+      <div className="rounded-xl bg-slate-900/95 p-3.5 shadow-xl border border-slate-700 text-white text-xs max-w-xs">
         <div className="font-bold text-sm text-emerald-400 mb-1 flex items-center justify-between">
           <span>{label}</span>
-          <span className="text-[10px] text-slate-400 font-normal">Mes #{mesData?.numero_mes}</span>
+          <span className="text-[10px] text-slate-400 font-normal tabular-nums">Mes #{mesData?.numero_mes}</span>
         </div>
-        <div className="text-slate-300 font-semibold mb-2">
+        <div className="text-slate-300 font-semibold mb-2 tabular-nums">
           Saldo Total: {formatoMoneda(mesData?.saldo_total_final || 0)}
         </div>
         <div className="space-y-1 border-t border-slate-800 pt-2">
@@ -64,12 +64,12 @@ function CustomTooltipContent({ active, payload, label, meses }: TooltipProps) {
                 />
                 <span className="truncate text-slate-300">{entry.name}:</span>
               </div>
-              <span className="font-bold">{formatoMoneda(entry.value)}</span>
+              <span className="font-bold tabular-nums">{formatoMoneda(entry.value)}</span>
             </div>
           ))}
         </div>
         {mesData && (
-          <div className="mt-2 pt-2 border-t border-slate-800 text-[11px] text-slate-400 flex justify-between">
+          <div className="mt-2 pt-2 border-t border-slate-800 text-[11px] text-slate-400 flex justify-between tabular-nums">
             <span>Pago inyectado este mes:</span>
             <span className="font-bold text-emerald-400">{formatoMoneda(mesData.pago_total_mes)}</span>
           </div>
@@ -100,41 +100,41 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
   return (
     <div className="space-y-6">
       {/* Tarjeta de Métricas Clave de la Simulación */}
-      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
+      <div className="p-6 rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[var(--border-subtle)]">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+              <span className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center font-bold">
                 <BarChart3 className="w-5 h-5" />
               </span>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">
                 Proyección Predictiva de la Bola de Nieve
               </h2>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs text-[var(--text-muted)] mt-1">
               Simulando el efecto cascada con corte a 120 meses. Al extinguirse una deuda, su cuota mínima acelera la siguiente.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700">
-            <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 pl-2">
+          <div className="flex items-center gap-2 bg-[var(--surface-subtle)] p-1.5 rounded-xl border border-[var(--border-subtle)]">
+            <span className="text-xs font-semibold text-[var(--text-secondary)] pl-2">
               Acelerar pago extra:
             </span>
             <button
               onClick={() => handleQuickAddExtra(500)}
-              className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition-colors"
+              className="px-2.5 py-1 text-xs font-bold rounded-lg bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
             >
               +$500
             </button>
             <button
               onClick={() => handleQuickAddExtra(1000)}
-              className="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition-colors"
+              className="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95"
             >
               +$1,000
             </button>
             <button
               onClick={onOpenConfigModal}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
             >
               Avanzado
             </button>
@@ -142,50 +142,50 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">
+          <div className="p-4 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)]">
+            <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
               Tiempo para Cero Deudas
             </span>
-            <div className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
+            <div className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1 tabular-nums">
               {simulacion.meses_totales} meses
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Fecha: <strong className="text-slate-800 dark:text-slate-200">{simulacion.fecha_libertad_financiera}</strong>
+            <div className="text-xs text-[var(--text-muted)] mt-0.5">
+              Fecha: <strong className="text-[var(--text-primary)]">{simulacion.fecha_libertad_financiera}</strong>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">
+          <div className="p-4 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)]">
+            <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
               Capital Amortizado
             </span>
-            <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1">
+            <div className="text-xl sm:text-2xl font-black text-[var(--text-primary)] mt-1 tabular-nums">
               {formatoMoneda(simulacion.total_capital_pagado)}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <div className="text-xs text-[var(--text-muted)] mt-0.5">
               100% de la deuda saldada
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">
+          <div className="p-4 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)]">
+            <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
               Intereses Proyectados
             </span>
-            <div className="text-xl sm:text-2xl font-black text-rose-500 mt-1">
+            <div className="text-xl sm:text-2xl font-black text-rose-500 mt-1 tabular-nums">
               {formatoMoneda(simulacion.total_intereses_proyectados)}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <div className="text-xs text-[var(--text-muted)] mt-0.5">
               Minimizados por la Bola de Nieve
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">
+          <div className="p-4 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)]">
+            <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
               Gran Total a Desembolsar
             </span>
-            <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
+            <div className="text-xl sm:text-2xl font-black text-[var(--brand-primary)] mt-1 tabular-nums">
               {formatoMoneda(simulacion.gran_total_pagado)}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <div className="text-xs text-[var(--text-muted)] mt-0.5">
               Capital + intereses + anualidades
             </div>
           </div>
@@ -193,10 +193,10 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
       </div>
 
       {simulacion.hitos_liquidacion.length > 0 && (
-        <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-indigo-500/10 border border-emerald-500/20">
+        <div className="p-5 rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs">
           <div className="flex items-center gap-2 mb-3">
-            <Award className="w-5 h-5 text-emerald-500" />
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            <Award className="w-5 h-5 text-[var(--brand-primary)]" />
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">
               Hitos de Victoria: ¿Cuándo liquidarás cada deuda?
             </h3>
           </div>
@@ -204,20 +204,20 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
             {simulacion.hitos_liquidacion.map((hito, idx) => (
               <div
                 key={hito.deuda_id}
-                className="p-3 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-sm"
+                className="p-3 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)]"
               >
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                  <span className="font-bold text-[var(--brand-primary)]">
                     Victoria #{idx + 1}
                   </span>
-                  <span className="font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[10px]">
+                  <span className="font-semibold px-2 py-0.5 rounded-full bg-[var(--brand-surface)] text-[var(--brand-text)] border border-[var(--brand-border)] text-[10px] tabular-nums">
                     Mes {hito.numero_mes}
                   </span>
                 </div>
-                <div className="mt-1 font-extrabold text-sm text-slate-900 dark:text-white truncate">
+                <div className="mt-1 font-extrabold text-sm text-[var(--text-primary)] truncate">
                   {hito.nombre_tarjeta}
                 </div>
-                <div className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                <div className="mt-0.5 text-xs text-[var(--text-muted)]">
                   {hito.fecha_etiqueta}
                 </div>
               </div>
@@ -227,13 +227,13 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
       )}
 
       {/* Gráfico de Área Apilada */}
-      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="p-6 rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base font-bold text-[var(--text-primary)]">
               Curva de Desendeudamiento Mes a Mes
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-[var(--text-muted)]">
               Evolución del saldo restante por tarjeta hasta llegar a cero
             </p>
           </div>
@@ -300,19 +300,19 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
       </div>
 
       {/* Tabla Detallada */}
-      <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <div className="rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs overflow-hidden">
+        <div className="p-5 border-b border-[var(--border-subtle)] flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base font-bold text-[var(--text-primary)]">
               Tabla de Proyección Mensual
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-[var(--text-muted)]">
               Desglose detallado del pago, intereses y amortización para cada mes
             </p>
           </div>
           <button
             onClick={() => setShowFullTable(!showFullTable)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--surface-subtle)] hover:bg-[var(--surface-muted)] text-[var(--text-secondary)] border border-[var(--border-subtle)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95"
           >
             {showFullTable ? (
               <>
@@ -330,7 +330,7 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase font-semibold">
+            <thead className="bg-[var(--surface-subtle)] border-b border-[var(--border-subtle)] text-[var(--text-muted)] uppercase font-semibold">
               <tr>
                 <th className="py-3 px-4">Mes #</th>
                 <th className="py-3 px-4">Fecha</th>
@@ -342,7 +342,7 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
                 <th className="py-3 px-4 text-center">Liquidadas</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+            <tbody className="divide-y divide-[var(--border-subtle)]">
               {mesesAMostrar.map((mes) => {
                 const tieneAnualidad = mes.anualidades_totales_mes > 0;
                 const tieneBonoAnual = mes.aportacion_anual_disponible > 0;
@@ -350,36 +350,36 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
                 return (
                   <tr
                     key={mes.numero_mes}
-                    className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
+                    className="hover:bg-[var(--surface-subtle)] transition-colors"
                   >
-                    <td className="py-3 px-4 font-bold text-slate-700 dark:text-slate-300">
+                    <td className="py-3 px-4 font-bold text-[var(--text-secondary)] tabular-nums">
                       {mes.numero_mes}
                     </td>
-                    <td className="py-3 px-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                    <td className="py-3 px-4 font-medium text-[var(--text-primary)] whitespace-nowrap">
                       <span>{mes.fecha_etiqueta}</span>
                       {tieneBonoAnual && (
-                        <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                        <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[var(--brand-surface)] text-[var(--brand-text)] border border-[var(--brand-border)] tabular-nums">
                           +Bono {formatoMoneda(mes.aportacion_anual_disponible)}
                         </span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-600 dark:text-slate-400 font-medium">
+                    <td className="py-3 px-4 text-right text-[var(--text-secondary)] font-medium tabular-nums">
                       {formatoMoneda(mes.saldo_total_inicial)}
                     </td>
-                    <td className="py-3 px-4 text-right text-rose-500 font-semibold">
+                    <td className="py-3 px-4 text-right text-rose-500 font-semibold tabular-nums">
                       {formatoMoneda(mes.intereses_totales_mes)}
                     </td>
-                    <td className="py-3 px-4 text-right text-amber-500 font-medium">
+                    <td className="py-3 px-4 text-right text-amber-500 font-medium tabular-nums">
                       {tieneAnualidad ? formatoMoneda(mes.anualidades_totales_mes) : '-'}
                     </td>
-                    <td className="py-3 px-4 text-right text-emerald-600 dark:text-emerald-400 font-black">
+                    <td className="py-3 px-4 text-right text-[var(--brand-primary)] font-black tabular-nums">
                       {formatoMoneda(mes.pago_total_mes)}
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-900 dark:text-white font-extrabold">
+                    <td className="py-3 px-4 text-right text-[var(--text-primary)] font-extrabold tabular-nums">
                       {formatoMoneda(mes.saldo_total_final)}
                     </td>
                     <td className="py-3 px-4 text-center">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-secondary)] tabular-nums">
                         {mes.deudas_liquidadas_acumuladas} / {deudasEnProyeccion.length}
                       </span>
                     </td>

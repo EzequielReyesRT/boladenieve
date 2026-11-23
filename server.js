@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { createServer } = require('http');
-const { parse } = require('url');
 const next = require('next');
 
 const dev = false;
@@ -13,8 +13,7 @@ if (isNaN(port) || port <= 0) {
 
 app.prepare().then(() => {
   createServer((req, res) => {
-    const parsedUrl = parse(req.url, true);
-    handle(req, res, parsedUrl);
+    handle(req, res);
   }).listen(port, () => {
     console.log(`> Bola de Nieve en ejecución en puerto ${port}`);
   });

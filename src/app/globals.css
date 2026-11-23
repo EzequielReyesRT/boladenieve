@@ -2,21 +2,237 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ==============================================================================
+   SISTEMA DE TOKENS SEMÁNTICOS CENTRALIZADOS (60-30-10)
+   Conforme a directrices ui-design-guardrails
+   ============================================================================== */
+
+@theme {
+  /* 60% Base Neutra Dominante */
+  --color-bg-base: var(--bg-base);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  /* 30% Superficies Secundarias y Estructura */
+  --color-surface-card: var(--surface-card);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface-muted: var(--surface-muted);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+
+  /* 10% Acento Dosificado (Identidad Financiera / CTAs) */
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-active: var(--brand-active);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-text: var(--brand-text);
+
+  /* Estados Funcionales Semánticos */
+  --color-status-danger: var(--status-danger);
+  --color-status-danger-surface: var(--status-danger-surface);
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-surface: var(--status-warning-surface);
+  --color-status-success: var(--status-success);
+  --color-status-success-surface: var(--status-success-surface);
+}
+
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  /* --- 60% BASE NEUTRA (Light Mode) --- */
+  --background: #f8fafc; /* Slate 50 */
+  --foreground: #0f172a; /* Slate 900 */
+  --bg-base: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #475569; /* Slate 600 */
+  --text-muted: #94a3b8; /* Slate 400 */
+
+  /* --- 30% SUPERFICIES Y ESTRUCTURA (Light Mode) --- */
+  --surface-card: #ffffff;
+  --surface-subtle: #f1f5f9; /* Slate 100 */
+  --surface-muted: #e2e8f0; /* Slate 200 */
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1; /* Slate 300 */
+
+  /* --- 10% ACENTO DOSIFICADO (Esmeralda Financiero - WCAG AA > 4.5:1) --- */
+  --brand-primary: #059669; /* Emerald 600 */
+  --brand-hover: #047857; /* Emerald 700 */
+  --brand-active: #065f46; /* Emerald 800 */
+  --brand-surface: #ecfdf5; /* Emerald 50 */
+  --brand-text: #065f46;
+
+  /* --- ESTADOS FUNCIONALES (Light Mode) --- */
+  --status-danger: #dc2626; /* Red 600 */
+  --status-danger-surface: #fef2f2; /* Red 50 */
+  --status-warning: #d97706; /* Amber 600 */
+  --status-warning-surface: #fffbeb; /* Amber 50 */
+  --status-success: #059669; /* Emerald 600 */
+  --status-success-surface: #ecfdf5; /* Emerald 50 */
 }
 
 .dark {
-  --background: #090d16;
-  --foreground: #f1f5f9;
+  /* --- 60% BASE NEUTRA (Dark Mode - Equilibrado, nunca #000000 puro) --- */
+  --background: #0b0f19; /* Azul pizarra muy profundo */
+  --foreground: #f8fafc; /* Slate 50 */
+  --bg-base: #0b0f19;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8; /* Slate 400 */
+  --text-muted: #64748b; /* Slate 500 */
+
+  /* --- 30% SUPERFICIES Y ESTRUCTURA (Dark Mode) --- */
+  --surface-card: #111827; /* Gray 900 sólido con alto contraste */
+  --surface-subtle: #1e293b; /* Slate 800 */
+  --surface-muted: #0f172a; /* Slate 950 */
+  --border-subtle: #1e293b;
+  --border-strong: #334155; /* Slate 700 */
+
+  /* --- 10% ACENTO DOSIFICADO (Dark Mode) --- */
+  --brand-primary: #10b981; /* Emerald 500 */
+  --brand-hover: #34d399; /* Emerald 400 */
+  --brand-active: #059669; /* Emerald 600 */
+  --brand-surface: rgba(16, 185, 129, 0.12);
+  --brand-text: #6ee7b7; /* Emerald 300 */
+
+  /* --- ESTADOS FUNCIONALES (Dark Mode) --- */
+  --status-danger: #f87171; /* Red 400 */
+  --status-danger-surface: rgba(239, 68, 68, 0.12);
+  --status-warning: #fbbf24; /* Amber 400 */
+  --status-warning-surface: rgba(245, 158, 11, 0.12);
+  --status-success: #34d399; /* Emerald 400 */
+  --status-success-surface: rgba(16, 185, 129, 0.12);
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ==============================================================================
+   TIPOGRAFÍA TABULAR Y NÚMEROS FINANCIEROS
+   Garantiza que cifras, saldos, fechas y porcentajes se alineen verticalmente
+   ============================================================================== */
+.tabular-nums,
+table,
+[data-tabular-nums="true"],
+.metric-value {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ==============================================================================
+   CLASES UTILITARIAS PARA LOS 4 ESTADOS INTERACTIVOS (ui-design-guardrails)
+   1. Hover: feedback sutil
+   2. Focus-visible: outline accesible ring
+   3. Active: pulsación scale(0.98)
+   4. Disabled: opacity-50 + not-allowed + pointer-events-none
+   ============================================================================== */
+
+/* Botón de Acción Principal (10% Acento) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  background-color: var(--brand-primary);
+  color: #ffffff;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  user-select: none;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--brand-hover);
+}
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--brand-primary);
+}
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+  background-color: var(--brand-active);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Botón Secundario / Neutro */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  background-color: var(--surface-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  user-select: none;
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--surface-muted);
+  border-color: var(--border-strong);
+}
+.btn-secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--border-strong);
+}
+.btn-secondary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Input y Select Estandarizado */
+.input-base {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  border-radius: 0.75rem;
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.input-base::placeholder {
+  color: var(--text-muted);
+}
+.input-base:hover:not(:disabled) {
+  border-color: var(--border-strong);
+}
+.input-base:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-surface);
+}
+.input-base:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--surface-muted);
+}
+
+/* Tarjeta / Panel Estandarizado */
+.card-base {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
 }
 
 /* Custom scrollbars */
@@ -28,9 +244,9 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
+  background: var(--border-strong);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.7);
+  background: var(--text-muted);
 }
