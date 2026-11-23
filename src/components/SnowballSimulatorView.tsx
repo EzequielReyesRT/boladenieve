@@ -47,7 +47,7 @@ function CustomTooltipContent({ active, payload, label, meses }: TooltipProps) {
     const mesData = meses.find((m) => m.fecha_etiqueta === label);
     return (
       <div className="rounded-xl bg-slate-900/95 p-3.5 shadow-xl border border-slate-700 text-white text-xs max-w-xs">
-        <div className="font-bold text-sm text-emerald-400 mb-1 flex items-center justify-between">
+        <div className="font-bold text-sm text-white mb-1 flex items-center justify-between">
           <span>{label}</span>
           <span className="text-[10px] text-slate-400 font-normal tabular-nums">Mes #{mesData?.numero_mes}</span>
         </div>
@@ -158,7 +158,7 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
             <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
               Capital Amortizado
             </span>
-            <div className="text-xl sm:text-2xl font-black text-[var(--text-primary)] mt-1 tabular-nums">
+            <div className="text-xl sm:text-2xl font-black text-[var(--status-success)] mt-1 tabular-nums">
               {formatoMoneda(simulacion.total_capital_pagado)}
             </div>
             <div className="text-xs text-[var(--text-muted)] mt-0.5">
@@ -182,7 +182,7 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
             <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
               Gran Total a Desembolsar
             </span>
-            <div className="text-xl sm:text-2xl font-black text-[var(--brand-primary)] mt-1 tabular-nums">
+            <div className="text-xl sm:text-2xl font-black text-[var(--text-primary)] mt-1 tabular-nums">
               {formatoMoneda(simulacion.gran_total_pagado)}
             </div>
             <div className="text-xs text-[var(--text-muted)] mt-0.5">
@@ -195,7 +195,7 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
       {simulacion.hitos_liquidacion.length > 0 && (
         <div className="p-5 rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs">
           <div className="flex items-center gap-2 mb-3">
-            <Award className="w-5 h-5 text-[var(--brand-primary)]" />
+            <Award className="w-5 h-5 text-amber-500" />
             <h3 className="text-sm font-bold text-[var(--text-primary)]">
               Hitos de Victoria: ¿Cuándo liquidarás cada deuda?
             </h3>
@@ -207,10 +207,10 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
                 className="p-3 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)]"
               >
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[var(--brand-primary)]">
+                  <span className="font-bold text-[var(--status-success)]">
                     Victoria #{idx + 1}
                   </span>
-                  <span className="font-semibold px-2 py-0.5 rounded-full bg-[var(--brand-surface)] text-[var(--brand-text)] border border-[var(--brand-border)] text-[10px] tabular-nums">
+                  <span className="font-semibold px-2 py-0.5 rounded-full bg-[var(--status-success-surface)] text-[var(--status-success-text)] border border-[var(--status-success-border)] text-[10px] tabular-nums">
                     Mes {hito.numero_mes}
                   </span>
                 </div>

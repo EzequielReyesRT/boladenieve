@@ -103,10 +103,10 @@ export function DeudasView({
           <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
             Liquidadas
           </span>
-          <div className="text-lg sm:text-xl font-black text-[var(--brand-primary)] mt-1 tabular-nums">
+          <div className="text-lg sm:text-xl font-black text-[var(--status-success)] mt-1 tabular-nums">
             {totalLiquidadas}
           </div>
-          <div className="text-[11px] text-[var(--brand-primary)] mt-0.5 flex items-center gap-1 font-medium">
+          <div className="text-[11px] text-[var(--status-success)] mt-0.5 flex items-center gap-1 font-medium">
             <CheckCircle2 className="w-3 h-3" />
             Flujo liberado
           </div>

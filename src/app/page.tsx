@@ -75,10 +75,8 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-[2px] animate-pulse">
-            <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-emerald-400" />
-            </div>
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+            <Sparkles className="w-6 h-6 text-blue-400" />
           </div>
           <div className="text-center">
             <p className="text-sm font-bold text-slate-200">
@@ -101,7 +99,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-[var(--brand-primary)] border-t-transparent rounded-full animate-spin" />
           <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
             Cargando simulador Bola de Nieve...
           </p>
@@ -134,10 +132,10 @@ export default function Home() {
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold">
+            <div className="w-8 h-8 rounded-lg bg-[var(--brand-primary)] flex items-center justify-center text-white font-bold">
               <Sparkles className="w-4 h-4" />
             </div>
-            <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-slate-900 via-emerald-800 to-teal-700 dark:from-white dark:via-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
+            <span className="font-extrabold text-base tracking-tight text-[var(--text-primary)]">
               Bola de Nieve
             </span>
           </div>
@@ -145,7 +143,7 @@ export default function Home() {
 
         <button
           onClick={() => handleOpenPay()}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-sm"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
         >
           <PlusCircle className="w-3.5 h-3.5" />
           <span>Abonar</span>

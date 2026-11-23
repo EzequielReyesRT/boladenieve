@@ -55,13 +55,13 @@ export function DebtCard({
           <div
             className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm tabular-nums ${
               isPaid
-                ? 'bg-[var(--brand-surface)] text-[var(--brand-text)]'
+                ? 'bg-[var(--status-success-surface)] text-[var(--status-success)] border border-[var(--status-success-border)]'
                 : isSnowballTarget
                 ? 'bg-[var(--brand-primary)] text-white shadow-sm'
                 : 'bg-[var(--surface-subtle)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
             }`}
           >
-            {isPaid ? <CheckCircle className="w-5 h-5 text-[var(--brand-primary)]" /> : `#${rank}`}
+            {isPaid ? <CheckCircle className="w-5 h-5 text-[var(--status-success)]" /> : `#${rank}`}
           </div>
 
           <div>
@@ -76,7 +76,7 @@ export function DebtCard({
                 </span>
               )}
               {isPaid && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[var(--brand-surface)] text-[var(--brand-text)]">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[var(--status-success-surface)] text-[var(--status-success-text)] border border-[var(--status-success-border)]">
                   Liquidada
                 </span>
               )}
@@ -114,7 +114,7 @@ export function DebtCard({
           <span className="text-[11px] font-medium text-[var(--text-secondary)] uppercase tracking-wider">
             Saldo Restante
           </span>
-          <div className={`text-lg sm:text-xl font-bold tracking-tight tabular-nums ${isPaid ? 'text-[var(--brand-primary)]' : 'text-[var(--status-danger)]'}`}>
+          <div className={`text-lg sm:text-xl font-bold tracking-tight tabular-nums ${isPaid ? 'text-[var(--status-success)]' : 'text-[var(--status-danger)]'}`}>
             {formatoMoneda(deuda.saldo_actual)}
           </div>
         </div>
@@ -132,7 +132,7 @@ export function DebtCard({
           <span className="text-[11px] font-medium text-[var(--text-secondary)] uppercase tracking-wider">
             Total Amortizado
           </span>
-          <div className="text-base sm:text-lg font-semibold text-[var(--brand-primary)] tracking-tight tabular-nums">
+          <div className="text-base sm:text-lg font-semibold text-[var(--status-success)] tracking-tight tabular-nums">
             {formatoMoneda(deuda.amortizacion_capital)}
           </div>
         </div>
@@ -142,13 +142,13 @@ export function DebtCard({
       <div className="mt-4 space-y-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="font-medium text-[var(--text-secondary)]">Progreso de liquidación:</span>
-          <span className="font-bold text-[var(--brand-primary)] tabular-nums">
+          <span className="font-bold text-[var(--status-success)] tabular-nums">
             {formatoPorcentaje(deuda.porcentaje_pagado)}
           </span>
         </div>
         <div className="w-full bg-[var(--surface-muted)] rounded-full h-2 overflow-hidden">
           <div
-            className="h-2 rounded-full bg-[var(--brand-primary)] transition-all duration-500"
+            className="h-2 rounded-full bg-[var(--status-success)] transition-all duration-500"
             style={{ width: `${Math.min(100, Math.max(0, deuda.porcentaje_pagado))}%` }}
           />
         </div>

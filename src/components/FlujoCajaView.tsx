@@ -142,8 +142,8 @@ export function FlujoCajaView({
       <div className="relative overflow-hidden rounded-2xl bg-slate-900 dark:bg-[var(--surface-card)] border border-slate-800 dark:border-[var(--border-subtle)] p-6 sm:p-8 shadow-xs">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold tracking-wide uppercase mb-3">
-              <Scale className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--brand-surface)] border border-[var(--brand-border)] text-[var(--brand-text)] text-xs font-bold tracking-wide uppercase mb-3">
+              <Scale className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
               <span>Presupuesto y Flujo de Caja</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white dark:text-[var(--text-primary)] tracking-tight">
@@ -157,7 +157,7 @@ export function FlujoCajaView({
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => onOpenNewMovimiento('Ingreso')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white text-xs font-bold shadow-xs active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--status-success)] hover:bg-[var(--status-success-hover)] text-white text-xs font-bold shadow-xs active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--status-success)] focus-visible:ring-offset-2"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Registrar Ingreso</span>
@@ -219,14 +219,14 @@ export function FlujoCajaView({
             <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
               Total Ingresos
             </span>
-            <div className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[var(--status-success-surface)] text-[var(--status-success)] border border-[var(--status-success-border)] flex items-center justify-center">
               <ArrowUpCircle className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-[var(--brand-primary)] tracking-tight tabular-nums">
+          <div className="text-2xl font-black text-[var(--status-success)] tracking-tight tabular-nums">
             {formatoMoneda(totalIngresos)}
           </div>
-          <p className="mt-1 text-xs text-[var(--brand-primary)] flex items-center gap-1 font-semibold">
+          <p className="mt-1 text-xs text-[var(--status-success-text)] flex items-center gap-1 font-semibold">
             <span>Entrada total del mes</span>
           </p>
         </div>
@@ -266,7 +266,7 @@ export function FlujoCajaView({
           </div>
           <p className="mt-1 text-xs font-semibold tabular-nums">
             {pagosRealesTarjetas >= compromisoMinimosDeuda && compromisoMinimosDeuda > 0 ? (
-              <span className="text-[var(--brand-primary)]">
+              <span className="text-[var(--status-success)]">
                 ✓ Mínimos cubiertos ({formatoMoneda(pagosRealesTarjetas)} pagados)
               </span>
             ) : pagosRealesTarjetas > 0 ? (
@@ -285,22 +285,36 @@ export function FlujoCajaView({
         <div
           className={`relative overflow-hidden rounded-2xl p-5 shadow-xs border ${
             flujoNetoExcedente > 0
-              ? 'bg-[var(--brand-surface)] border-[var(--brand-border)]'
+              ? 'bg-[var(--status-success-surface)] border-[var(--status-success-border)]'
               : 'bg-[var(--surface-card)] border-[var(--border-subtle)]'
           }`}
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-[var(--brand-primary)] flex items-center gap-1">
+            <span
+              className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1 ${
+                flujoNetoExcedente > 0 ? 'text-[var(--status-success-text)]' : 'text-[var(--text-muted)]'
+              }`}
+            >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Excedente Libre</span>
             </span>
-            <div className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center">
+            <div
+              className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                flujoNetoExcedente > 0
+                  ? 'bg-[var(--status-success-surface)] text-[var(--status-success)] border border-[var(--status-success-border)]'
+                  : 'bg-[var(--surface-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)]'
+              }`}
+            >
               <Zap className="w-4 h-4" />
             </div>
           </div>
           <div
             className={`text-2xl font-black tracking-tight tabular-nums ${
-              flujoNetoExcedente >= 0 ? 'text-[var(--brand-primary)]' : 'text-rose-500'
+              flujoNetoExcedente > 0
+                ? 'text-[var(--status-success)]'
+                : flujoNetoExcedente === 0
+                ? 'text-[var(--text-primary)]'
+                : 'text-rose-500'
             }`}
           >
             {formatoMoneda(flujoNetoExcedente)}
@@ -465,7 +479,7 @@ export function FlujoCajaView({
                     <div
                       className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                         esIngreso
-                          ? 'bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)]'
+                          ? 'bg-[var(--status-success-surface)] text-[var(--status-success)] border border-[var(--status-success-border)]'
                           : esAbonoTarjeta
                           ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20'
                           : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
@@ -488,7 +502,7 @@ export function FlujoCajaView({
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 ${
                             esIngreso
-                              ? 'bg-[var(--brand-surface)] text-[var(--brand-text)] border border-[var(--brand-border)]'
+                              ? 'bg-[var(--status-success-surface)] text-[var(--status-success-text)] border border-[var(--status-success-border)]'
                               : esAbonoTarjeta
                               ? 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20'
                               : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20'
@@ -520,7 +534,7 @@ export function FlujoCajaView({
                       <div
                         className={`text-sm sm:text-base font-extrabold tabular-nums ${
                           esIngreso
-                            ? 'text-[var(--brand-primary)]'
+                            ? 'text-[var(--status-success)]'
                             : esAbonoTarjeta
                             ? 'text-indigo-600 dark:text-indigo-400'
                             : 'text-rose-600 dark:text-rose-400'

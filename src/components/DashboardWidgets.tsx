@@ -124,7 +124,7 @@ export function DashboardWidgets({
               <TrendingDown className="w-3.5 h-3.5" />
               {totalDeudasPendientes} {totalDeudasPendientes === 1 ? 'pendiente' : 'pendientes'}
             </span>
-            <span className="text-[var(--brand-primary)] font-semibold tabular-nums">
+            <span className="text-[var(--status-success)] font-semibold tabular-nums">
               {totalDeudasLiquidadas} liquidadas
             </span>
           </div>
@@ -136,24 +136,24 @@ export function DashboardWidgets({
             <span className="text-xs font-semibold tracking-wide uppercase text-[var(--text-muted)]">
               Deuda liquidada
             </span>
-            <div className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[var(--status-success-surface)] text-[var(--status-success)] border border-[var(--status-success-border)] flex items-center justify-center">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-extrabold text-[var(--brand-primary)] tracking-tight tabular-nums">
+            <div className="text-2xl sm:text-3xl font-extrabold text-[var(--status-success)] tracking-tight tabular-nums">
               {formatoPorcentaje(porcentajeAvanceGlobal)}
             </div>
             <div className="mt-2 w-full bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-full h-2 overflow-hidden">
               <div
-                className="bg-[var(--brand-primary)] h-2 rounded-full transition-all duration-700"
+                className="bg-[var(--status-success)] h-2 rounded-full transition-all duration-700"
                 style={{ width: `${Math.min(100, Math.max(0, porcentajeAvanceGlobal))}%` }}
               />
             </div>
           </div>
           <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs text-[var(--text-muted)]">
             <span>Amortizado:</span>
-            <span className="font-semibold text-[var(--brand-primary)] tabular-nums">
+            <span className="font-semibold text-[var(--status-success)] tabular-nums">
               {formatoMoneda(Math.max(0, deudaTotalOriginal - deudaTotalActual))}
             </span>
           </div>
@@ -191,7 +191,13 @@ export function DashboardWidgets({
           {onGoToFlujo && (
             <button
               onClick={onGoToFlujo}
-              className="mt-2.5 w-full flex items-center justify-between text-[11px] px-2 py-1.5 rounded-lg bg-[var(--brand-surface)] border border-[var(--brand-border)] text-[var(--brand-text)] hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98 transition-all"
+              className={`mt-2.5 w-full flex items-center justify-between text-[11px] px-2 py-1.5 rounded-lg border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98 ${
+                (resumenFlujoMes?.flujo_neto_disponible || 0) > 0
+                  ? 'bg-[var(--status-success-surface)] border-[var(--status-success-border)] text-[var(--status-success-text)]'
+                  : (resumenFlujoMes?.flujo_neto_disponible || 0) < 0
+                  ? 'bg-rose-500/10 border-rose-500/20 text-rose-700 dark:text-rose-300'
+                  : 'bg-[var(--surface-subtle)] border-[var(--border-subtle)] text-[var(--text-secondary)]'
+              }`}
             >
               <span>Flujo libre este mes:</span>
               <span className="font-bold tabular-nums">

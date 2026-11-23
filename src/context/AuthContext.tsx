@@ -22,7 +22,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = useCallback(async () => {
     try {
       const res = await fetch('/api/auth/me', {
-        headers: { 'Cache-Control': 'no-cache' },
+        credentials: 'include',
+        headers: { 'Cache-Control': 'no-cache, no-store' },
       });
       if (res.ok) {
         const data = await res.json();
@@ -43,7 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function initializeAuth() {
       try {
         const res = await fetch('/api/auth/me', {
-          headers: { 'Cache-Control': 'no-cache' },
+          credentials: 'include',
+          headers: { 'Cache-Control': 'no-cache, no-store' },
         });
         if (res.ok) {
           const data = await res.json();
@@ -76,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password, rememberMe }),
       });
@@ -100,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nombre, email, password }),
       });
@@ -122,7 +126,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     setIsLoading(true);
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
     } catch {
       // ignore
     } finally {

@@ -26,6 +26,7 @@
   --color-brand-hover: var(--brand-hover);
   --color-brand-active: var(--brand-active);
   --color-brand-surface: var(--brand-surface);
+  --color-brand-border: var(--brand-border);
   --color-brand-text: var(--brand-text);
 
   /* Estados Funcionales Semánticos */
@@ -34,7 +35,10 @@
   --color-status-warning: var(--status-warning);
   --color-status-warning-surface: var(--status-warning-surface);
   --color-status-success: var(--status-success);
+  --color-status-success-hover: var(--status-success-hover);
   --color-status-success-surface: var(--status-success-surface);
+  --color-status-success-border: var(--status-success-border);
+  --color-status-success-text: var(--status-success-text);
 }
 
 :root {
@@ -53,22 +57,26 @@
   --border-subtle: #e2e8f0;
   --border-strong: #cbd5e1; /* Slate 300 */
 
-  /* --- 10% ACENTO DOSIFICADO (Esmeralda Financiero - WCAG AA > 4.5:1) --- */
-  --brand-primary: #059669; /* Emerald 600 */
-  --brand-hover: #047857; /* Emerald 700 */
+  /* --- 10% ACENTO DOSIFICADO (Azul Corporativo / Financiero - WCAG AA > 4.5:1) --- */
+  --brand-primary: #2563eb; /* Blue 600 */
+  --brand-hover: #1d4ed8; /* Blue 700 */
   --brand-primary-hover: var(--brand-hover);
-  --brand-active: #065f46; /* Emerald 800 */
-  --brand-surface: #ecfdf5; /* Emerald 50 */
-  --brand-border: #a7f3d0; /* Emerald 200 */
-  --brand-text: #065f46;
+  --brand-active: #1e40af; /* Blue 800 */
+  --brand-surface: #eff6ff; /* Blue 50 */
+  --brand-border: #bfdbfe; /* Blue 200 */
+  --brand-text: #1d4ed8; /* Blue 700 */
 
   /* --- ESTADOS FUNCIONALES (Light Mode) --- */
   --status-danger: #dc2626; /* Red 600 */
   --status-danger-surface: #fef2f2; /* Red 50 */
   --status-warning: #d97706; /* Amber 600 */
   --status-warning-surface: #fffbeb; /* Amber 50 */
-  --status-success: #059669; /* Emerald 600 */
-  --status-success-surface: #ecfdf5; /* Emerald 50 */
+  /* Verde reservado estrictamente para saldos positivos, ingresos, amortizaciones y liquidaciones */
+  --status-success: #16a34a; /* Green 600 */
+  --status-success-hover: #15803d; /* Green 700 */
+  --status-success-surface: #f0fdf4; /* Green 50 */
+  --status-success-border: #bbf7d0; /* Green 200 */
+  --status-success-text: #166534; /* Green 800 */
 }
 
 .dark {
@@ -88,21 +96,25 @@
   --border-strong: #334155; /* Slate 700 */
 
   /* --- 10% ACENTO DOSIFICADO (Dark Mode) --- */
-  --brand-primary: #10b981; /* Emerald 500 */
-  --brand-hover: #34d399; /* Emerald 400 */
+  --brand-primary: #3b82f6; /* Blue 500 */
+  --brand-hover: #60a5fa; /* Blue 400 */
   --brand-primary-hover: var(--brand-hover);
-  --brand-active: #059669; /* Emerald 600 */
-  --brand-surface: rgba(16, 185, 129, 0.12);
-  --brand-border: rgba(52, 211, 153, 0.24);
-  --brand-text: #6ee7b7; /* Emerald 300 */
+  --brand-active: #2563eb; /* Blue 600 */
+  --brand-surface: rgba(59, 130, 246, 0.12);
+  --brand-border: rgba(96, 165, 250, 0.25);
+  --brand-text: #93c5fd; /* Blue 300 */
 
   /* --- ESTADOS FUNCIONALES (Dark Mode) --- */
   --status-danger: #f87171; /* Red 400 */
   --status-danger-surface: rgba(239, 68, 68, 0.12);
   --status-warning: #fbbf24; /* Amber 400 */
   --status-warning-surface: rgba(245, 158, 11, 0.12);
-  --status-success: #34d399; /* Emerald 400 */
-  --status-success-surface: rgba(16, 185, 129, 0.12);
+  /* Verde reservado estrictamente para saldos positivos, ingresos, amortizaciones y liquidaciones (Dark Mode) */
+  --status-success: #22c55e; /* Green 500 */
+  --status-success-hover: #4ade80; /* Green 400 */
+  --status-success-surface: rgba(34, 197, 94, 0.12);
+  --status-success-border: rgba(74, 222, 128, 0.25);
+  --status-success-text: #86efac; /* Green 300 */
 }
 
 body {

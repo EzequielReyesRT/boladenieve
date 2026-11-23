@@ -237,7 +237,7 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
                     <td className="py-3.5 px-4 text-right font-semibold text-rose-500 tabular-nums">
                       {pago.intereses_cobrados > 0 ? formatoMoneda(pago.intereses_cobrados) : '-'}
                     </td>
-                    <td className="py-3.5 px-4 text-right font-bold text-[var(--brand-primary)] tabular-nums">
+                    <td className="py-3.5 px-4 text-right font-bold text-[var(--status-success)] tabular-nums">
                       {formatoMoneda(amort)}
                     </td>
                     <td className="py-3.5 px-4 text-[var(--text-muted)] max-w-[150px] truncate">
