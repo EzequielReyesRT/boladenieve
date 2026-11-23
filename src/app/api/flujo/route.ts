@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { MovimientoFlujo } from '@/types';
+import {
+  syncMovimientoFlujoInsert,
+  syncMovimientoFlujoUpdate,
+  syncMovimientoFlujoDelete,
+} from '@/lib/sqlserver';
 
 interface MovimientoRow {
   id: string;
@@ -84,18 +89,16 @@ export async function POST(request: Request) {
       ]
     );
 
-    // 2. Replicar a SQL Server si está disponible
-    try {
-      const { exec } = await import('child_process');
-      const safeDesc = (body.descripcion || '').replace(/'/g, "''");
-      const safeCat = (body.categoria || '').replace(/'/g, "''");
-      const safeTipo = (body.tipo || 'Gasto').replace(/'/g, "''");
-      const recBit = esRecurrente ? 1 : 0;
-      const sqlQuery = `INSERT INTO dbo.MovimientosFlujo (Id, Tipo, Categoria, Descripcion, Monto, Fecha, EsRecurrente) VALUES (N'${id}', N'${safeTipo}', N'${safeCat}', N'${safeDesc}', ${monto}, '${fecha}', ${recBit});`;
-      exec(`sqlcmd -S localhost\\SQLEXPRESS -U sa -P W81wocn21n -C -d BolaDeNieve -Q "${sqlQuery}"`);
-    } catch {
-      // Ignorar si SQL Server no está disponible en este momento
-    }
+    // 2. Replicar a SQL Server si está disponible (método seguro sin shell ni credenciales expuestas)
+    await syncMovimientoFlujoInsert({
+      id,
+      tipo: body.tipo,
+      categoria: body.categoria,
+      descripcion: body.descripcion,
+      monto,
+      fecha,
+      es_recurrente: esRecurrente,
+    });
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
@@ -136,18 +139,16 @@ export async function PUT(request: Request) {
       ]
     );
 
-    // 2. Replicar actualización a SQL Server
-    try {
-      const { exec } = await import('child_process');
-      const safeDesc = (body.descripcion || '').replace(/'/g, "''");
-      const safeCat = (body.categoria || '').replace(/'/g, "''");
-      const safeTipo = (body.tipo || 'Gasto').replace(/'/g, "''");
-      const recBit = esRecurrente ? 1 : 0;
-      const sqlQuery = `UPDATE dbo.MovimientosFlujo SET Tipo = N'${safeTipo}', Categoria = N'${safeCat}', Descripcion = N'${safeDesc}', Monto = ${monto}, Fecha = '${fecha}', EsRecurrente = ${recBit}, UpdatedAt = SYSUTCDATETIME() WHERE Id = N'${body.id}';`;
-      exec(`sqlcmd -S localhost\\SQLEXPRESS -U sa -P W81wocn21n -C -d BolaDeNieve -Q "${sqlQuery}"`);
-    } catch {
-      // Ignorar error de réplica
-    }
+    // 2. Replicar actualización a SQL Server de forma segura
+    await syncMovimientoFlujoUpdate({
+      id: body.id,
+      tipo: body.tipo,
+      categoria: body.categoria,
+      descripcion: body.descripcion,
+      monto,
+      fecha,
+      es_recurrente: esRecurrente,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -168,12 +169,8 @@ export async function DELETE(request: Request) {
     const db = getDb();
     await db.query('DELETE FROM movimientos_flujo WHERE id = $1', [id]);
 
-    try {
-      const { exec } = await import('child_process');
-      exec(`sqlcmd -S localhost\\SQLEXPRESS -U sa -P W81wocn21n -C -d BolaDeNieve -Q "DELETE FROM dbo.MovimientosFlujo WHERE Id = N'${id}';"`);
-    } catch {
-      // Ignorar error de réplica
-    }
+    // Replicar eliminación a SQL Server de forma segura
+    await syncMovimientoFlujoDelete(id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

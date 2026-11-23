@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { BitacoraPago } from '@/types';
+import { syncPagoInsert, syncPagoDelete } from '@/lib/sqlserver';
 
 interface PagoRow {
   id: string;
@@ -91,24 +92,8 @@ export async function POST(request: Request) {
       ]
     );
 
-    // 3. Replicar a SQL Server si está disponible
-    try {
-      const { exec } = await import('child_process');
-      const safeDesc = desc.replace(/'/g, "''");
-      const safeCat = cat.replace(/'/g, "''");
-      const folioVal = body.folio_comprobante ? `N'${body.folio_comprobante.replace(/'/g, "''")}'` : 'NULL';
-      const sqlQuery = `
-        IF NOT EXISTS (SELECT 1 FROM dbo.BitacoraPagos WHERE Id = N'${id}')
-          INSERT INTO dbo.BitacoraPagos (Id, DeudaId, FechaPago, TipoPago, MontoTotal, InteresesCobrados, FolioComprobante)
-          VALUES (N'${id}', N'${body.deuda_id}', '${body.fecha_pago}', N'${body.tipo_pago}', ${body.monto_total}, ${body.intereses_cobrados || 0}, ${folioVal});
-        IF NOT EXISTS (SELECT 1 FROM dbo.MovimientosFlujo WHERE Id = N'${flujoId}')
-          INSERT INTO dbo.MovimientosFlujo (Id, Tipo, Categoria, Descripcion, Monto, Fecha, EsRecurrente)
-          VALUES (N'${flujoId}', N'Gasto', N'${safeCat}', N'${safeDesc}', ${body.monto_total}, '${body.fecha_pago}', 0);
-      `;
-      exec(`sqlcmd -S localhost\\SQLEXPRESS -U sa -P W81wocn21n -C -d BolaDeNieve -Q "${sqlQuery.replace(/\r?\n/g, ' ')}"`);
-    } catch {
-      // Ignorar si SQL Server no está disponible en este momento
-    }
+    // 3. Replicar a SQL Server si está disponible (método seguro sin shell ni credenciales expuestas)
+    await syncPagoInsert(body, nombreTarjeta);
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
@@ -132,16 +117,8 @@ export async function DELETE(request: Request) {
     await db.query('DELETE FROM bitacora_pagos WHERE id = $1', [id]);
     await db.query('DELETE FROM movimientos_flujo WHERE id = $1', [flujoId]);
 
-    try {
-      const { exec } = await import('child_process');
-      const sqlQuery = `
-        DELETE FROM dbo.BitacoraPagos WHERE Id = N'${id}';
-        DELETE FROM dbo.MovimientosFlujo WHERE Id = N'${flujoId}';
-      `;
-      exec(`sqlcmd -S localhost\\SQLEXPRESS -U sa -P W81wocn21n -C -d BolaDeNieve -Q "${sqlQuery.replace(/\r?\n/g, ' ')}"`);
-    } catch {
-      // Ignorar
-    }
+    // Replicar eliminación a SQL Server de forma segura
+    await syncPagoDelete(id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

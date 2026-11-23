@@ -10,7 +10,7 @@
     "db:init": "node scripts/init-db.mjs",
     "db:clean": "node scripts/clean-db.mjs",
     "db:export": "node scripts/export-db.mjs",
-    "db:sqlserver": "sqlcmd -S localhost\\SQLEXPRESS -U sa -P W81wocn21n -C -i scripts/setup-sqlserver.sql"
+    "db:sqlserver": "node scripts/setup-sqlserver.mjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.16",
