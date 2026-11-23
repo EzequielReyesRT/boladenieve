@@ -47,17 +47,18 @@ export function DashboardWidgets({
   return (
     <div className="space-y-6">
       {/* Banner de Estado Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-slate-900 dark:bg-[var(--surface-card)] border border-slate-800 dark:border-[var(--border-subtle)] p-6 text-white shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-6 sm:p-8 text-[var(--text-primary)] shadow-sm">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-[var(--brand-surface)] blur-3xl" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-              Estrategia Bola de Nieve Activa
+            <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-text)]">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)]"><Sparkles className="w-3.5 h-3.5" /></span>
+              PLAN DE PAGO ACTIVO
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white dark:text-[var(--text-primary)]">
-              Tu Camino hacia la Libertad Financiera
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+              Avanza hacia tu libertad financiera
             </h1>
-            <p className="text-sm text-slate-300 dark:text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+            <p className="text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
               Priorizando primero las deudas de menor saldo para ganar victorias psicológicas rápidas
               y transferir ese flujo de caja en cascada a las siguientes.
             </p>
@@ -66,14 +67,14 @@ export function DashboardWidgets({
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
             <button
               onClick={onOpenAddDebtModal}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 dark:bg-[var(--surface-subtle)] dark:hover:bg-[var(--surface-muted)] text-white dark:text-[var(--text-primary)] text-sm font-semibold border border-white/20 dark:border-[var(--border-subtle)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--surface-card)] hover:bg-[var(--surface-subtle)] text-[var(--text-primary)] text-sm font-semibold border border-[var(--border-subtle)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98"
             >
               <Plus className="w-4 h-4" />
               Nueva Deuda
             </button>
             <button
               onClick={onGoToSimulator}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white text-sm font-bold shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-98"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-hover)] text-white text-sm font-bold shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 active:scale-98"
             >
               Ver Simulación
               <ArrowRight className="w-4 h-4" />
@@ -103,7 +104,7 @@ export function DashboardWidgets({
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold tracking-wide uppercase text-[var(--text-muted)]">
-              Deuda Total Actual
+              Saldo pendiente
             </span>
             <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center">
               <DollarSign className="w-4 h-4" />
@@ -133,7 +134,7 @@ export function DashboardWidgets({
         <div className="rounded-2xl p-5 bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs relative overflow-hidden transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold tracking-wide uppercase text-[var(--text-muted)]">
-              Avance General
+              Deuda liquidada
             </span>
             <div className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center">
               <CheckCircle2 className="w-4 h-4" />
@@ -162,7 +163,7 @@ export function DashboardWidgets({
         <div className="rounded-2xl p-5 bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs relative overflow-hidden transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold tracking-wide uppercase text-[var(--text-muted)]">
-              Pago Extra Mensual
+              Aporte extra mensual
             </span>
             <button
               onClick={onOpenConfigModal}

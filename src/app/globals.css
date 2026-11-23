@@ -56,8 +56,10 @@
   /* --- 10% ACENTO DOSIFICADO (Esmeralda Financiero - WCAG AA > 4.5:1) --- */
   --brand-primary: #059669; /* Emerald 600 */
   --brand-hover: #047857; /* Emerald 700 */
+  --brand-primary-hover: var(--brand-hover);
   --brand-active: #065f46; /* Emerald 800 */
   --brand-surface: #ecfdf5; /* Emerald 50 */
+  --brand-border: #a7f3d0; /* Emerald 200 */
   --brand-text: #065f46;
 
   /* --- ESTADOS FUNCIONALES (Light Mode) --- */
@@ -88,8 +90,10 @@
   /* --- 10% ACENTO DOSIFICADO (Dark Mode) --- */
   --brand-primary: #10b981; /* Emerald 500 */
   --brand-hover: #34d399; /* Emerald 400 */
+  --brand-primary-hover: var(--brand-hover);
   --brand-active: #059669; /* Emerald 600 */
   --brand-surface: rgba(16, 185, 129, 0.12);
+  --brand-border: rgba(52, 211, 153, 0.24);
   --brand-text: #6ee7b7; /* Emerald 300 */
 
   /* --- ESTADOS FUNCIONALES (Dark Mode) --- */
