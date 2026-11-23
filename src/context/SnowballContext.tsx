@@ -20,6 +20,7 @@ import {
   simularBolaDeNieve,
 } from '@/lib/snowball-engine';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 interface SnowballContextType {
   config: ConfiguracionUsuario;
@@ -59,6 +60,7 @@ const LOCAL_STORAGE_KEYS = {
 };
 
 export function SnowballProvider({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [config, setConfig] = useState<ConfiguracionUsuario>(CONFIG_INICIAL);
   const [deudas, setDeudas] = useState<Deuda[]>(DEUDAS_INICIALES);
   const [bitacora, setBitacora] = useState<BitacoraPago[]>(BITACORA_INICIAL);
@@ -69,6 +71,11 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
   // 1. Cargar datos iniciales
   useEffect(() => {
     async function loadData() {
+      if (isAuthLoading) return;
+      if (!isAuthenticated) {
+        setIsLoaded(true);
+        return;
+      }
       // Prioridad 1: Supabase si están las credenciales
       if (isSupabaseConfigured && supabase) {
         try {
@@ -134,7 +141,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     }
 
     loadData();
-  }, []);
+  }, [isAuthenticated, isAuthLoading]);
 
   // 2. Guardar en LocalStorage como respaldo adicional
   useEffect(() => {

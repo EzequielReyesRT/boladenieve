@@ -31,6 +31,7 @@ async function init() {
     await db.exec(`
       CREATE TABLE IF NOT EXISTS configuracion_usuario (
         id TEXT PRIMARY KEY,
+        user_id TEXT,
         pago_extra_mensual NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
         mes_calendario_inicio SMALLINT NOT NULL DEFAULT 1,
         anio_inicio SMALLINT NOT NULL DEFAULT 2026,
@@ -45,6 +46,7 @@ async function init() {
     await db.exec(`
       CREATE TABLE IF NOT EXISTS deudas (
         id TEXT PRIMARY KEY,
+        user_id TEXT,
         nombre_tarjeta VARCHAR(120) NOT NULL,
         saldo_inicial NUMERIC(12, 2) NOT NULL,
         tasa_anual_porcentaje NUMERIC(5, 2) NOT NULL,
@@ -61,6 +63,7 @@ async function init() {
       CREATE TABLE IF NOT EXISTS bitacora_pagos (
         id TEXT PRIMARY KEY,
         deuda_id TEXT NOT NULL REFERENCES deudas(id) ON DELETE CASCADE,
+        user_id TEXT,
         fecha_pago DATE NOT NULL DEFAULT CURRENT_DATE,
         tipo_pago VARCHAR(20) NOT NULL,
         monto_total NUMERIC(12, 2) NOT NULL,
@@ -129,9 +132,9 @@ async function init() {
       console.log('🌱 Insertando configuración inicial...');
       await db.query(`
         INSERT INTO configuracion_usuario (
-          id, pago_extra_mensual, mes_calendario_inicio, anio_inicio, aportacion_unica_anual, mes_aportacion_unica
+          id, user_id, pago_extra_mensual, mes_calendario_inicio, anio_inicio, aportacion_unica_anual, mes_aportacion_unica
         ) VALUES (
-          'config-default', 2000.00, 11, 2026, 12000.00, 12
+          'config-default', 'u-admin', 2000.00, 11, 2026, 12000.00, 12
         );
       `);
     }
@@ -141,21 +144,21 @@ async function init() {
     if (parseInt(deudasCheck.rows[0].count, 10) === 0) {
       console.log('🌱 Insertando deudas iniciales para desarrollo...');
       await db.query(`
-        INSERT INTO deudas (id, nombre_tarjeta, saldo_inicial, tasa_anual_porcentaje, pago_minimo, costo_anualidad, mes_cobro_anualidad)
+        INSERT INTO deudas (id, user_id, nombre_tarjeta, saldo_inicial, tasa_anual_porcentaje, pago_minimo, costo_anualidad, mes_cobro_anualidad)
         VALUES 
-          ('d-1', 'Liverpool Departamental', 7800.00, 58.00, 650.00, 0.00, 1),
-          ('d-2', 'BBVA Azul Crédito', 16500.00, 49.50, 1100.00, 780.00, 6),
-          ('d-3', 'Banorte Oro Clásica', 32000.00, 42.00, 1950.00, 1150.00, 11),
-          ('d-4', 'Préstamo Nómina Santander', 55000.00, 29.90, 3200.00, 0.00, 1);
+          ('d-1', 'u-admin', 'Liverpool Departamental', 7800.00, 58.00, 650.00, 0.00, 1),
+          ('d-2', 'u-admin', 'BBVA Azul Crédito', 16500.00, 49.50, 1100.00, 780.00, 6),
+          ('d-3', 'u-admin', 'Banorte Oro Clásica', 32000.00, 42.00, 1950.00, 1150.00, 11),
+          ('d-4', 'u-admin', 'Préstamo Nómina Santander', 55000.00, 29.90, 3200.00, 0.00, 1);
       `);
 
       console.log('🌱 Insertando historial inicial de pagos...');
       await db.query(`
-        INSERT INTO bitacora_pagos (id, deuda_id, fecha_pago, tipo_pago, monto_total, intereses_cobrados, folio_comprobante)
+        INSERT INTO bitacora_pagos (id, deuda_id, user_id, fecha_pago, tipo_pago, monto_total, intereses_cobrados, folio_comprobante)
         VALUES
-          ('p-1', 'd-1', '2026-10-05', 'Extra', 2500.00, 320.00, 'SPEI-8849102-LIV'),
-          ('p-2', 'd-2', '2026-10-10', 'Minimo', 1100.00, 580.00, 'APP-BBVA-9921'),
-          ('p-3', 'd-3', '2026-10-15', 'Minimo', 1950.00, 980.00, 'BNT-0044812');
+          ('p-1', 'd-1', 'u-admin', '2026-10-05', 'Extra', 2500.00, 320.00, 'SPEI-8849102-LIV'),
+          ('p-2', 'd-2', 'u-admin', '2026-10-10', 'Minimo', 1100.00, 580.00, 'APP-BBVA-9921'),
+          ('p-3', 'd-3', 'u-admin', '2026-10-15', 'Minimo', 1950.00, 980.00, 'BNT-0044812');
       `);
     }
 

@@ -1,11 +1,40 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import { cookies } from 'next/headers';
 import { getDb } from './db';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { Usuario } from '@/types';
 
-const SESSION_SECRET = process.env.SESSION_SECRET || 'bola-de-nieve-secure-session-key-2026-financial-freedom';
 const COOKIE_NAME = 'bola_session';
+
+// Obtiene la clave de firma de sesión de forma segura y criptográficamente robusta
+let cachedSecret: string | null = null;
+
+export function getSessionSecret(): string {
+  if (cachedSecret) return cachedSecret;
+
+  const envSecret = process.env.SESSION_SECRET;
+  const INSECURE_DEFAULT = 'bola-de-nieve-secure-session-key-2026-financial-freedom';
+
+  // Si se definió en variables de entorno y no es el valor por defecto inseguro
+  if (envSecret && envSecret.trim().length >= 32 && envSecret !== INSECURE_DEFAULT) {
+    cachedSecret = envSecret.trim();
+    return cachedSecret;
+  }
+
+  // En producción, NUNCA usar la clave insegura conocida en el repositorio
+  if (process.env.NODE_ENV === 'production') {
+    console.error(
+      '⚠️ [SEGURIDAD] SESSION_SECRET no configurada o insegura en producción. Generando clave criptográfica efímera.'
+    );
+    cachedSecret = crypto.randomBytes(64).toString('hex');
+    return cachedSecret;
+  }
+
+  // En desarrollo local
+  cachedSecret = envSecret || 'dev-only-local-secret-boladenieve-key-32chars';
+  return cachedSecret;
+}
 
 export interface UserRow {
   id: string;
@@ -38,7 +67,7 @@ export function generateToken(user: Usuario, days = 30): string {
 
   const payloadB64 = Buffer.from(JSON.stringify(payload)).toString('base64url');
   const signature = crypto
-    .createHmac('sha256', SESSION_SECRET)
+    .createHmac('sha256', getSessionSecret())
     .update(payloadB64)
     .digest('base64url');
 
@@ -52,13 +81,16 @@ export function verifyToken(token: string): SessionPayload | null {
     if (!payloadB64 || !signature) return null;
 
     const expectedSignature = crypto
-      .createHmac('sha256', SESSION_SECRET)
+      .createHmac('sha256', getSessionSecret())
       .update(payloadB64)
       .digest('base64url');
 
+    const sigBuf = Buffer.from(signature);
+    const expBuf = Buffer.from(expectedSignature);
+
     if (
-      signature.length !== expectedSignature.length ||
-      !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))
+      sigBuf.length !== expBuf.length ||
+      !crypto.timingSafeEqual(sigBuf, expBuf)
     ) {
       return null;
     }
@@ -72,6 +104,18 @@ export function verifyToken(token: string): SessionPayload | null {
     }
 
     return payload;
+  } catch {
+    return null;
+  }
+}
+
+// Obtiene el usuario de la sesión activa leyendo las cookies de la petición
+export async function getSessionUser(): Promise<SessionPayload | null> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(COOKIE_NAME)?.value;
+    if (!token) return null;
+    return verifyToken(token);
   } catch {
     return null;
   }
@@ -122,17 +166,18 @@ export async function authenticateUser(
     return null;
   }
 
-  // Comprueba bcrypt hash o fallback
+  // Solo se acepta comparación contra hash criptográfico seguro (bcrypt)
   let isValid = false;
   try {
-    isValid = await bcrypt.compare(passwordPlain, user.password_hash);
+    if (
+      user.password_hash &&
+      typeof user.password_hash === 'string' &&
+      user.password_hash.startsWith('$2')
+    ) {
+      isValid = await bcrypt.compare(passwordPlain, user.password_hash);
+    }
   } catch {
     isValid = false;
-  }
-
-  // Fallback si por alguna razón fuera texto plano durante importación
-  if (!isValid && user.password_hash === passwordPlain) {
-    isValid = true;
   }
 
   if (!isValid) return null;
@@ -154,9 +199,14 @@ export async function registerNewUser(
 ): Promise<{ user?: Usuario; error?: string }> {
   const cleanEmail = emailOrUsername.trim().toLowerCase();
   const cleanNombre = nombre.trim();
+
+  if (!passwordPlain || passwordPlain.length < 8) {
+    return { error: 'La contraseña debe tener al menos 8 caracteres.' };
+  }
+
   const id = `u-${Date.now()}`;
   const rol = 'usuario';
-  const passwordHash = await bcrypt.hash(passwordPlain, 10);
+  const passwordHash = await bcrypt.hash(passwordPlain, 12);
 
   // 1. Si Supabase está configurado, registrar en la nube
   if (isSupabaseConfigured && supabase) {

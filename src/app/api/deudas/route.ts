@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { getSessionUser } from '@/lib/auth';
 import { Deuda } from '@/types';
 
 interface DeudaRow {
   id: string;
+  user_id?: string;
   nombre_tarjeta: string;
   saldo_inicial: string | number;
   tasa_anual_porcentaje: string | number;
@@ -16,10 +18,22 @@ interface DeudaRow {
 
 export async function GET() {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const db = getDb();
-    const res = await db.query<DeudaRow>('SELECT * FROM deudas ORDER BY saldo_inicial ASC');
+    const query =
+      session.rol === 'admin'
+        ? 'SELECT * FROM deudas ORDER BY saldo_inicial ASC'
+        : 'SELECT * FROM deudas WHERE user_id = $1 ORDER BY saldo_inicial ASC';
+    const params = session.rol === 'admin' ? [] : [session.id];
+
+    const res = await db.query<DeudaRow>(query, params);
     const deudas: Deuda[] = res.rows.map((row) => ({
       id: row.id,
+      user_id: row.user_id,
       nombre_tarjeta: row.nombre_tarjeta,
       saldo_inicial: Number(row.saldo_inicial),
       tasa_anual_porcentaje: Number(row.tasa_anual_porcentaje),
@@ -39,18 +53,25 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const body: Deuda = await request.json();
     const db = getDb();
     const id = body.id || `d-${Date.now()}`;
+    const userId = session.id;
 
     await db.query(
       `
       INSERT INTO deudas (
-        id, nombre_tarjeta, saldo_inicial, tasa_anual_porcentaje, pago_minimo, costo_anualidad, mes_cobro_anualidad
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        id, user_id, nombre_tarjeta, saldo_inicial, tasa_anual_porcentaje, pago_minimo, costo_anualidad, mes_cobro_anualidad
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `,
       [
         id,
+        userId,
         body.nombre_tarjeta,
         body.saldo_inicial,
         body.tasa_anual_porcentaje,
@@ -69,8 +90,30 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const body: Deuda = await request.json();
     const db = getDb();
+
+    // Prevención de IDOR: verificar propiedad del recurso
+    const existing = await db.query<DeudaRow>('SELECT id, user_id FROM deudas WHERE id = $1', [body.id]);
+    if (existing.rows.length === 0) {
+      return NextResponse.json({ error: 'Deuda no encontrada' }, { status: 404 });
+    }
+
+    if (
+      session.rol !== 'admin' &&
+      existing.rows[0].user_id &&
+      existing.rows[0].user_id !== session.id
+    ) {
+      return NextResponse.json(
+        { error: 'Acceso denegado: no tienes permiso para modificar este recurso.' },
+        { status: 403 }
+      );
+    }
 
     await db.query(
       `
@@ -104,6 +147,11 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
@@ -112,6 +160,24 @@ export async function DELETE(request: Request) {
     }
 
     const db = getDb();
+
+    // Prevención de IDOR: verificar propiedad del recurso
+    const existing = await db.query<DeudaRow>('SELECT id, user_id FROM deudas WHERE id = $1', [id]);
+    if (existing.rows.length === 0) {
+      return NextResponse.json({ error: 'Deuda no encontrada' }, { status: 404 });
+    }
+
+    if (
+      session.rol !== 'admin' &&
+      existing.rows[0].user_id &&
+      existing.rows[0].user_id !== session.id
+    ) {
+      return NextResponse.json(
+        { error: 'Acceso denegado: no tienes permiso para eliminar este recurso.' },
+        { status: 403 }
+      );
+    }
+
     await db.query('DELETE FROM deudas WHERE id = $1', [id]);
 
     return NextResponse.json({ success: true });

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { getSessionUser } from '@/lib/auth';
 import { MovimientoFlujo } from '@/types';
 import {
   syncMovimientoFlujoInsert,
@@ -22,22 +23,37 @@ interface MovimientoRow {
 
 export async function GET(request: Request) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const mes = searchParams.get('mes');
     const anio = searchParams.get('anio');
 
     const db = getDb();
-    let query = 'SELECT * FROM movimientos_flujo ORDER BY fecha DESC, created_at DESC';
+    let query = 'SELECT * FROM movimientos_flujo';
     const params: (string | number)[] = [];
+    const conditions: string[] = [];
+
+    if (session.rol !== 'admin') {
+      params.push(session.id);
+      conditions.push(`user_id = $${params.length}`);
+    }
 
     if (mes && anio) {
-      query = `
-        SELECT * FROM movimientos_flujo
-        WHERE EXTRACT(MONTH FROM fecha::date) = $1 AND EXTRACT(YEAR FROM fecha::date) = $2
-        ORDER BY fecha DESC, created_at DESC
-      `;
-      params.push(parseInt(mes, 10), parseInt(anio, 10));
+      params.push(parseInt(mes, 10));
+      const mesIdx = params.length;
+      params.push(parseInt(anio, 10));
+      const anioIdx = params.length;
+      conditions.push(`EXTRACT(MONTH FROM fecha::date) = $${mesIdx} AND EXTRACT(YEAR FROM fecha::date) = $${anioIdx}`);
     }
+
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ');
+    }
+    query += ' ORDER BY fecha DESC, created_at DESC';
 
     const res = await db.query<MovimientoRow>(query, params);
 
@@ -63,12 +79,18 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const db = getDb();
     const id = body.id || `flujo-${Date.now()}`;
     const monto = Number(body.monto) || 0;
     const esRecurrente = Boolean(body.es_recurrente);
     const fecha = body.fecha || new Date().toISOString().split('T')[0];
+    const userId = session.id;
 
     // 1. Guardar en base de datos local PGlite
     await db.query(
@@ -79,7 +101,7 @@ export async function POST(request: Request) {
       `,
       [
         id,
-        body.user_id || null,
+        userId,
         body.tipo,
         body.categoria,
         body.descripcion,
@@ -109,8 +131,31 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const db = getDb();
+
+    // Prevención de IDOR: comprobar propiedad antes de actualizar
+    const existing = await db.query<{ user_id?: string }>('SELECT user_id FROM movimientos_flujo WHERE id = $1', [body.id]);
+    if (existing.rows.length === 0) {
+      return NextResponse.json({ error: 'Movimiento no encontrado' }, { status: 404 });
+    }
+
+    if (
+      session.rol !== 'admin' &&
+      existing.rows[0].user_id &&
+      existing.rows[0].user_id !== session.id
+    ) {
+      return NextResponse.json(
+        { error: 'Acceso denegado: no tienes permiso para modificar este movimiento.' },
+        { status: 403 }
+      );
+    }
+
     const monto = Number(body.monto) || 0;
     const esRecurrente = Boolean(body.es_recurrente);
     const fecha = body.fecha || new Date().toISOString().split('T')[0];
@@ -159,6 +204,11 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
@@ -167,6 +217,24 @@ export async function DELETE(request: Request) {
     }
 
     const db = getDb();
+
+    // Prevención de IDOR: comprobar propiedad antes de eliminar
+    const existing = await db.query<{ user_id?: string }>('SELECT user_id FROM movimientos_flujo WHERE id = $1', [id]);
+    if (existing.rows.length === 0) {
+      return NextResponse.json({ error: 'Movimiento no encontrado' }, { status: 404 });
+    }
+
+    if (
+      session.rol !== 'admin' &&
+      existing.rows[0].user_id &&
+      existing.rows[0].user_id !== session.id
+    ) {
+      return NextResponse.json(
+        { error: 'Acceso denegado: no tienes permiso para eliminar este movimiento.' },
+        { status: 403 }
+      );
+    }
+
     await db.query('DELETE FROM movimientos_flujo WHERE id = $1', [id]);
 
     // Replicar eliminación a SQL Server de forma segura

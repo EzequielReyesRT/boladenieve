@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { getSessionUser } from '@/lib/auth';
 import { BitacoraPago } from '@/types';
 import { syncPagoInsert, syncPagoDelete } from '@/lib/sqlserver';
 
 interface PagoRow {
   id: string;
   deuda_id: string;
+  user_id?: string;
   fecha_pago: string | Date;
   tipo_pago: 'Minimo' | 'Extra' | 'Anualidad' | 'Liquidacion';
   monto_total: string | number;
@@ -16,11 +18,23 @@ interface PagoRow {
 
 export async function GET() {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const db = getDb();
-    const res = await db.query<PagoRow>('SELECT * FROM bitacora_pagos ORDER BY fecha_pago DESC');
+    const query =
+      session.rol === 'admin'
+        ? 'SELECT * FROM bitacora_pagos ORDER BY fecha_pago DESC'
+        : 'SELECT * FROM bitacora_pagos WHERE user_id = $1 ORDER BY fecha_pago DESC';
+    const params = session.rol === 'admin' ? [] : [session.id];
+
+    const res = await db.query<PagoRow>(query, params);
     const pagos: BitacoraPago[] = res.rows.map((row) => ({
       id: row.id,
       deuda_id: row.deuda_id,
+      user_id: row.user_id,
       fecha_pago: typeof row.fecha_pago === 'string' ? row.fecha_pago : new Date(row.fecha_pago).toISOString().split('T')[0],
       tipo_pago: row.tipo_pago,
       monto_total: Number(row.monto_total),
@@ -38,20 +52,50 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const body: BitacoraPago = await request.json();
     const db = getDb();
     const id = body.id || `p-${Date.now()}`;
+    const userId = session.id;
+
+    // Prevención de IDOR: comprobar que la deuda destino pertenece al usuario autenticado
+    const deudaRes = await db.query<{ nombre_tarjeta: string; user_id?: string }>(
+      'SELECT nombre_tarjeta, user_id FROM deudas WHERE id = $1 LIMIT 1',
+      [body.deuda_id]
+    );
+
+    if (deudaRes.rows.length === 0) {
+      return NextResponse.json({ error: 'La deuda especificada no existe.' }, { status: 404 });
+    }
+
+    if (
+      session.rol !== 'admin' &&
+      deudaRes.rows[0].user_id &&
+      deudaRes.rows[0].user_id !== session.id
+    ) {
+      return NextResponse.json(
+        { error: 'Acceso denegado: no puedes registrar pagos para deudas de otro usuario.' },
+        { status: 403 }
+      );
+    }
+
+    const nombreTarjeta = deudaRes.rows[0]?.nombre_tarjeta || 'Tarjeta / Crédito';
 
     // 1. Guardar en bitácora de pagos
     await db.query(
       `
       INSERT INTO bitacora_pagos (
-        id, deuda_id, fecha_pago, tipo_pago, monto_total, intereses_cobrados, folio_comprobante
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        id, deuda_id, user_id, fecha_pago, tipo_pago, monto_total, intereses_cobrados, folio_comprobante
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `,
       [
         id,
         body.deuda_id,
+        userId,
         body.fecha_pago,
         body.tipo_pago,
         body.monto_total,
@@ -61,11 +105,6 @@ export async function POST(request: Request) {
     );
 
     // 2. Registrar automáticamente en movimientos_flujo como Gasto
-    const deudaRes = await db.query<{ nombre_tarjeta: string }>(
-      'SELECT nombre_tarjeta FROM deudas WHERE id = $1 LIMIT 1',
-      [body.deuda_id]
-    );
-    const nombreTarjeta = deudaRes.rows[0]?.nombre_tarjeta || 'Tarjeta / Crédito';
     const flujoId = `flujo-pago-${id}`;
     const desc = `Abono a ${nombreTarjeta} (${body.tipo_pago})`;
     const cat = 'Pago de Tarjeta / Crédito';
@@ -82,7 +121,7 @@ export async function POST(request: Request) {
       `,
       [
         flujoId,
-        body.user_id || null,
+        userId,
         'Gasto',
         cat,
         desc,
@@ -104,6 +143,11 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado. Se requiere iniciar sesión.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
@@ -112,6 +156,24 @@ export async function DELETE(request: Request) {
     }
 
     const db = getDb();
+
+    // Prevención de IDOR: verificar propiedad del pago antes de eliminar
+    const existing = await db.query<{ user_id?: string }>('SELECT user_id FROM bitacora_pagos WHERE id = $1', [id]);
+    if (existing.rows.length === 0) {
+      return NextResponse.json({ error: 'Pago no encontrado' }, { status: 404 });
+    }
+
+    if (
+      session.rol !== 'admin' &&
+      existing.rows[0].user_id &&
+      existing.rows[0].user_id !== session.id
+    ) {
+      return NextResponse.json(
+        { error: 'Acceso denegado: no tienes permiso para eliminar este pago.' },
+        { status: 403 }
+      );
+    }
+
     const flujoId = `flujo-pago-${id}`;
 
     await db.query('DELETE FROM bitacora_pagos WHERE id = $1', [id]);

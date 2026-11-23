@@ -20,9 +20,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!password || password.length < 6) {
+    if (!password || password.length < 8) {
       return NextResponse.json(
-        { success: false, error: 'La contraseña debe tener al menos 6 caracteres.' },
+        { success: false, error: 'La contraseña debe tener al menos 8 caracteres.' },
         { status: 400 }
       );
     }
