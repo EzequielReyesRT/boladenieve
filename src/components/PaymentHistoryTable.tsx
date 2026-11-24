@@ -156,8 +156,13 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
         </div>
       </div>
 
-      {/* Tabla Responsiva */}
-      <div className="overflow-x-auto rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs">
+      {/* Tabla Responsiva (Modern Web Guidance: responsive-table) */}
+      <div
+        tabIndex={0}
+        role="region"
+        aria-label="Historial de pagos registrados"
+        className="overflow-x-auto rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
+      >
         {filteredPagos.length === 0 ? (
           <div className="text-center py-12 px-4 max-w-sm mx-auto">
             <div className="w-12 h-12 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)] flex items-center justify-center mx-auto mb-3 text-[var(--text-muted)]">
@@ -195,7 +200,8 @@ export function PaymentHistoryTable({ onOpenPaymentModal }: PaymentHistoryTableP
           </div>
         ) : (
           <table className="w-full text-left text-xs">
-            <thead className="bg-[var(--surface-subtle)] border-b border-[var(--border-subtle)] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
+            <caption className="sr-only">Historial de abonos y amortizaciones de deudas</caption>
+            <thead className="sticky top-0 z-10 bg-[var(--surface-subtle)] border-b border-[var(--border-subtle)] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
               <tr>
                 <th className="py-3 px-4">Fecha</th>
                 <th className="py-3 px-4">Tarjeta</th>

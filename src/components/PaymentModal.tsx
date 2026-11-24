@@ -11,6 +11,7 @@ import {
   Sparkles,
   AlertCircle,
 } from 'lucide-react';
+import { useEscapeKey } from '@/hooks/useEscapeKey';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -357,10 +358,15 @@ export function PaymentModal({
   onClose,
   preselectedDebt,
 }: PaymentModalProps) {
+  useEscapeKey(isOpen, onClose);
+
   if (!isOpen) return null;
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payment-modal-title"
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -374,7 +380,7 @@ export function PaymentModal({
               <PlusCircle className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)] truncate">
+              <h2 id="payment-modal-title" className="text-base sm:text-lg font-bold text-[var(--text-primary)] truncate">
                 Registrar Pago en Bitácora
               </h2>
               <p className="text-[11px] sm:text-xs text-[var(--text-muted)] truncate">

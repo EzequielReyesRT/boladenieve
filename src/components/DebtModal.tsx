@@ -9,6 +9,7 @@ import {
   Check,
   AlertCircle,
 } from 'lucide-react';
+import { useEscapeKey } from '@/hooks/useEscapeKey';
 
 interface DebtModalProps {
   isOpen: boolean;
@@ -249,10 +250,15 @@ export function DebtModal({
   onClose,
   debtToEdit,
 }: DebtModalProps) {
+  useEscapeKey(isOpen, onClose);
+
   if (!isOpen) return null;
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="debt-modal-title"
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -265,7 +271,7 @@ export function DebtModal({
               <CreditCard className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)] truncate">
+              <h2 id="debt-modal-title" className="text-base sm:text-lg font-bold text-[var(--text-primary)] truncate">
                 {debtToEdit ? 'Editar Deuda / Tarjeta' : 'Agregar Nueva Deuda'}
               </h2>
               <p className="text-[11px] sm:text-xs text-[var(--text-muted)] truncate">

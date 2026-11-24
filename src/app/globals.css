@@ -42,6 +42,15 @@
 }
 
 :root {
+  color-scheme: light dark;
+
+  &:has(> head > meta[name="color-scheme"][content="dark"]) {
+    color-scheme: dark;
+  }
+  &:has(> head > meta[name="color-scheme"][content="light"]) {
+    color-scheme: light;
+  }
+
   /* --- 60% BASE NEUTRA (Light Mode) --- */
   --background: #f8fafc; /* Slate 50 */
   --foreground: #0f172a; /* Slate 900 */
@@ -279,18 +288,43 @@ table,
   text-transform: uppercase;
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* ==============================================================================
+   SCROLLBAR ESTANDARIZADO (Modern Web Guidance: customize-scrollbar-color-and-thickness)
+   ============================================================================== */
+:root {
+  --scrollbar-thumb: var(--border-strong);
+  --scrollbar-track: transparent;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+@supports not (scrollbar-color: auto) {
+  :root {
+    scrollbar-width: auto;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+  }
 }
-::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 9999px;
+
+/* ==============================================================================
+   MODAL OVERSCROLL CONTAINMENT (Modern Web Guidance: prevent-page-scroll-under-modal-dialog)
+   ============================================================================== */
+dialog:modal {
+  overscroll-behavior: contain;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
 }
