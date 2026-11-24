@@ -67,7 +67,7 @@ export function DeudasView({
           <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
             Saldo Restante
           </span>
-          <div className="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-400 mt-1 tabular-nums">
+          <div className="text-lg sm:text-xl font-black text-[var(--status-danger)] mt-1 tabular-nums">
             {formatoMoneda(deudaTotalActual)}
           </div>
           <div className="text-[11px] text-[var(--text-muted)] mt-0.5 tabular-nums">

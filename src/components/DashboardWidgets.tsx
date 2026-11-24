@@ -47,20 +47,20 @@ export function DashboardWidgets({
   return (
     <div className="space-y-6">
       {/* Banner de Estado Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-6 sm:p-8 text-[var(--text-primary)] shadow-xs">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[var(--brand-surface)] blur-3xl opacity-60" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--brand-surface)] border border-[var(--brand-border)] text-xs font-bold tracking-wide text-[var(--brand-text)]">
-              <Sparkles className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
-              <span>PLAN BOLA DE NIEVE ACTIVO</span>
+      <div className="rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-6 sm:p-8 text-[var(--text-primary)] shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
+                Avanza hacia tu libertad financiera
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--brand-surface)] border border-[var(--brand-border)] text-[11px] font-bold text-[var(--brand-text)] tracking-wide uppercase">
+                <Sparkles className="w-3 h-3 text-[var(--brand-primary)]" />
+                Plan Activo
+              </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
-              Avanza hacia tu libertad financiera
-            </h1>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-              Priorizando deudas de menor saldo para conquistar victorias psicológicas rápidas
-              y transferir ese flujo de caja liberado en cascada hacia las siguientes.
+              Prioriza el saldo menor para conquistar victorias tempranas y acelerar el flujo de caja en cascada hacia las siguientes deudas.
             </p>
           </div>
 
@@ -106,7 +106,7 @@ export function DashboardWidgets({
             <span className="text-xs font-semibold tracking-wide uppercase text-[var(--text-muted)]">
               Saldo pendiente
             </span>
-            <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[var(--status-danger-surface)] text-[var(--status-danger)] border border-rose-200 dark:border-rose-900/40 flex items-center justify-center">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
@@ -169,13 +169,13 @@ export function DashboardWidgets({
               onClick={onOpenConfigModal}
               title="Modificar aportación extra"
               aria-label="Modificar aportación extra en configuración"
-              className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center hover:bg-indigo-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 transition-all"
+              className="w-8 h-8 rounded-lg bg-[var(--brand-surface)] text-[var(--brand-primary)] border border-[var(--brand-border)] flex items-center justify-center hover:bg-[var(--brand-surface)]/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95 transition-all cursor-pointer"
             >
               <Zap className="w-4 h-4" />
             </button>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight tabular-nums">
+            <div className="text-2xl sm:text-3xl font-extrabold text-[var(--brand-primary)] tracking-tight tabular-nums">
               {formatoMoneda(config.pago_extra_mensual)}
             </div>
             <div className="mt-1 text-xs text-[var(--text-muted)]">
@@ -184,18 +184,18 @@ export function DashboardWidgets({
           </div>
           <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
             <span className="text-[var(--text-muted)]">Anual (Mes {config.mes_aportacion_unica}):</span>
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400 tabular-nums">
+            <span className="font-semibold text-[var(--brand-primary)] tabular-nums">
               {formatoMoneda(config.aportacion_unica_anual)}
             </span>
           </div>
           {onGoToFlujo && (
             <button
               onClick={onGoToFlujo}
-              className={`mt-2.5 w-full flex items-center justify-between text-[11px] px-2 py-1.5 rounded-lg border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98 ${
+              className={`mt-2.5 w-full flex items-center justify-between text-[11px] px-2.5 py-1.5 rounded-lg border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-98 cursor-pointer ${
                 (resumenFlujoMes?.flujo_neto_disponible || 0) > 0
                   ? 'bg-[var(--status-success-surface)] border-[var(--status-success-border)] text-[var(--status-success-text)]'
                   : (resumenFlujoMes?.flujo_neto_disponible || 0) < 0
-                  ? 'bg-rose-500/10 border-rose-500/20 text-rose-700 dark:text-rose-300'
+                  ? 'bg-[var(--status-danger-surface)] border-rose-200 dark:border-rose-900/50 text-[var(--status-danger)]'
                   : 'bg-[var(--surface-subtle)] border-[var(--border-subtle)] text-[var(--text-secondary)]'
               }`}
             >
@@ -213,12 +213,12 @@ export function DashboardWidgets({
             <span className="text-xs font-semibold tracking-wide uppercase text-[var(--text-muted)]">
               Meta Bola de Nieve
             </span>
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[var(--status-warning-surface)] text-[var(--status-warning)] border border-amber-200 dark:border-amber-900/40 flex items-center justify-center">
               <Calendar className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400 tracking-tight tabular-nums">
+            <div className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight tabular-nums">
               {simulacion.meses_totales > 0 ? `${simulacion.meses_totales} meses` : '¡Libre!'}
             </div>
             <div className="mt-1 text-xs font-medium text-[var(--text-secondary)]">
@@ -227,7 +227,7 @@ export function DashboardWidgets({
           </div>
           <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs text-[var(--text-muted)]">
             <span>Intereses proyectados:</span>
-            <span className="font-semibold text-rose-500 tabular-nums">
+            <span className="font-semibold text-rose-600 dark:text-rose-400 tabular-nums">
               {formatoMoneda(simulacion.total_intereses_proyectados)}
             </span>
           </div>

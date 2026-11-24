@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-24T10:51:30.000Z",
+  "title": "Design System: Bola de Nieve",
+  "extensions": {
+    "colorMeta": {
+      "cobalt-precision": {
+        "role": "primary",
+        "displayName": "Cobalt Precision",
+        "canonical": "#2563eb",
+        "tonalRamp": ["#1e3a8a", "#1e40af", "#1d4ed8", "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#eff6ff"]
+      },
+      "slate-neutral-bg": {
+        "role": "neutral",
+        "displayName": "Slate Canvas",
+        "canonical": "#f8fafc",
+        "tonalRamp": ["#020617", "#0b0f19", "#0f172a", "#1e293b", "#334155", "#94a3b8", "#e2e8f0", "#f8fafc"]
+      },
+      "slate-neutral-surface": {
+        "role": "neutral",
+        "displayName": "Surface Card",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#111827", "#1e293b", "#334155", "#64748b", "#94a3b8", "#cbd5e1", "#f1f5f9", "#ffffff"]
+      },
+      "slate-neutral-subtle": {
+        "role": "neutral",
+        "displayName": "Surface Subtle",
+        "canonical": "#f1f5f9",
+        "tonalRamp": ["#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#e2e8f0", "#f1f5f9"]
+      },
+      "slate-neutral-border": {
+        "role": "neutral",
+        "displayName": "Border Subtle",
+        "canonical": "#e2e8f0",
+        "tonalRamp": ["#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0"]
+      },
+      "slate-neutral-text": {
+        "role": "neutral",
+        "displayName": "Text Primary",
+        "canonical": "#0f172a",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#f8fafc"]
+      },
+      "emerald-amortization": {
+        "role": "secondary",
+        "displayName": "Emerald Amortization",
+        "canonical": "#16a34a",
+        "tonalRamp": ["#052e16", "#14532d", "#166534", "#15803d", "#16a34a", "#22c55e", "#86efac", "#f0fdf4"]
+      },
+      "crimson-liability": {
+        "role": "tertiary",
+        "displayName": "Crimson Liability",
+        "canonical": "#dc2626",
+        "tonalRamp": ["#450a0a", "#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ef4444", "#fca5a5", "#fef2f2"]
+      },
+      "amber-caution": {
+        "role": "tertiary",
+        "displayName": "Amber Caution",
+        "canonical": "#d97706",
+        "tonalRamp": ["#451a03", "#78350f", "#92400e", "#b45309", "#d97706", "#f59e0b", "#fde68a", "#fffbeb"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Métricas globales y estadísticas principales." },
+      "headline": { "displayName": "Headline", "purpose": "Títulos de secciones principales." },
+      "title": { "displayName": "Title", "purpose": "Encabezados de tarjetas y modales." },
+      "body": { "displayName": "Body", "purpose": "Texto general y etiquetas de formulario." },
+      "label": { "displayName": "Label", "purpose": "Botones, badges e indicadores compactos." }
+    },
+    "shadows": [
+      {
+        "name": "card-subtle",
+        "value": "0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.03)",
+        "purpose": "Reposo de paneles y tarjetas estándar."
+      },
+      {
+        "name": "kpi-hover",
+        "value": "0 4px 12px 0 rgba(0, 0, 0, 0.04)",
+        "purpose": "Elevación sutil al hover en widgets interactivos."
+      },
+      {
+        "name": "btn-focus",
+        "value": "0 0 0 2px var(--bg-base, #ffffff), 0 0 0 4px #2563eb",
+        "purpose": "Anillo de enfoque accesible para navegación por teclado."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Transición estándar en interacciones táctiles y cambios de estado (150ms)."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Llamada a la acción principal del 10% de acento.",
+      "html": "<button class=\"ds-btn-primary\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg><span>Registrar Pago</span></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; font-size: 12px; font-weight: 700; border-radius: 12px; background-color: var(--brand-primary, #2563eb); color: #ffffff; border: 1px solid transparent; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1); user-select: none; } .ds-btn-primary:hover { background-color: var(--brand-hover, #1d4ed8); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg-base, #ffffff), 0 0 0 4px var(--brand-primary, #2563eb); } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; } .ds-icon { width: 16px; height: 16px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción secundaria neutral para cancelar o cerrar.",
+      "html": "<button class=\"ds-btn-secondary\"><span>Cancelar</span></button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600; border-radius: 12px; background-color: var(--surface-subtle, #f1f5f9); color: var(--text-primary, #0f172a); border: 1px solid var(--border-subtle, #e2e8f0); cursor: pointer; transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-secondary:hover { background-color: var(--surface-muted, #e2e8f0); border-color: var(--border-strong, #cbd5e1); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg-base, #ffffff), 0 0 0 4px var(--border-strong, #cbd5e1); } .ds-btn-secondary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-base",
+      "description": "Campo de entrada estandarizado para montos o textos.",
+      "html": "<input type=\"text\" class=\"ds-input-base\" placeholder=\"$0.00\" value=\"$12,450.00\" />",
+      "css": ".ds-input-base { width: 100%; padding: 10px 14px; font-size: 14px; font-variant-numeric: tabular-nums; border-radius: 12px; background-color: var(--surface-subtle, #f1f5f9); border: 1px solid var(--border-subtle, #e2e8f0); color: var(--text-primary, #0f172a); transition: border-color 150ms ease, box-shadow 150ms ease; } .ds-input-base:hover { border-color: var(--border-strong, #cbd5e1); } .ds-input-base:focus { outline: none; border-color: var(--brand-primary, #2563eb); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }"
+    },
+    {
+      "name": "Card Base",
+      "kind": "card",
+      "refersTo": "card-base",
+      "description": "Contenedor de superficie estructurada de 30%.",
+      "html": "<div class=\"ds-card-base\"><h3 class=\"ds-card-title\">Resumen Mensual</h3><p class=\"ds-card-metric\">$8,350.00</p></div>",
+      "css": ".ds-card-base { background-color: var(--surface-card, #ffffff); border: 1px solid var(--border-subtle, #e2e8f0); border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); } .ds-card-title { font-size: 14px; font-weight: 600; color: var(--text-secondary, #475569); margin: 0 0 8px 0; } .ds-card-metric { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text-primary, #0f172a); margin: 0; }"
+    },
+    {
+      "name": "Snowball Target Card",
+      "kind": "card",
+      "refersTo": "card-snowball-target",
+      "description": "Tarjeta insignia que resalta la deuda prioritaria de bola de nieve.",
+      "html": "<div class=\"ds-snowball-target-card\"><div class=\"ds-card-header\"><span class=\"ds-badge-target\">🎯 PRIORIDAD 1</span><span class=\"ds-interest-tag\">CAT 49.5%</span></div><div class=\"ds-debt-name\">Tarjeta Oro BBVA</div><div class=\"ds-debt-amount\">$5,200.00</div></div>",
+      "css": ".ds-snowball-target-card { background-color: var(--surface-card, #ffffff); border: 2px solid var(--brand-primary, #2563eb); border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); } .ds-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; } .ds-badge-target { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 9999px; background: rgba(37, 99, 235, 0.12); color: var(--brand-primary, #2563eb); } .ds-interest-tag { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--text-secondary, #475569); } .ds-debt-name { font-size: 16px; font-weight: 700; color: var(--text-primary, #0f172a); } .ds-debt-amount { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text-primary, #0f172a); margin-top: 4px; }"
+    },
+    {
+      "name": "Pill Badge",
+      "kind": "chip",
+      "refersTo": "badge-pill",
+      "description": "Insignia pill para estados contables o categorías.",
+      "html": "<span class=\"ds-badge-pill ds-badge-success\">LIQUIDADA</span>",
+      "css": ".ds-badge-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.025em; text-transform: uppercase; } .ds-badge-success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }"
+    },
+    {
+      "name": "Sidebar Navigation Item",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Elemento de navegación de la barra lateral con estado activo.",
+      "html": "<div class=\"ds-nav-item active\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></svg><span>Dashboard</span></div>",
+      "css": ".ds-nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-secondary, #475569); cursor: pointer; transition: all 150ms ease; } .ds-nav-item:hover { background: var(--surface-subtle, #f1f5f9); color: var(--text-primary, #0f172a); } .ds-nav-item.active { background: rgba(37, 99, 235, 0.1); color: var(--brand-primary, #2563eb); font-weight: 700; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Precision Ledger",
+    "overview": "\"The Precision Ledger\" concibe a Bola de Nieve no como un juego ni como una calculadora fría, sino como un libro mayor de alta precisión que sustituye la angustia financiera por certidumbre matemática y calma visual. La interfaz proyecta solvencia mediante una estricta jerarquía tipográfica, datos monetarios tabulares rigurosamente alineados y una deliberada ausencia de ruido decorativo. Cada pantalla está optimizada para ser escaneada rápidamente en el teléfono al momento de realizar un pago o en el escritorio durante la planificación presupuestal mensual.\n\nLa densidad informativa es alta pero espaciosa y ordenada, apoyada en una arquitectura de superficies estructuradas en lugar de capas superpuestas arbitrarias. Se rechazan frontalmente los clichés visuales automatizados de IA (como degradados morado-neón, tarjetas flotantes con bordes brillantes y emojis en lugar de iconografía técnica) y se adopta un lenguaje gráfico sobrio inspirado en el diseño editorial financiero y las herramientas de contabilidad profesional moderna.",
+    "keyCharacteristics": [
+      "Estructura tonal gobernada por la regla 60-30-10 para máxima legibilidad y descanso cognitivo.",
+      "Cifras financieras y fechas en tipografía tabular inmutable (tabular-nums) para evitar desajustes verticales.",
+      "Superficies delimitadas por bordes nítidos y elevación sutil reservada para estados interactivos.",
+      "Iconografía vectorial consistente y técnica (Lucide Icons) sin emojis en controles de interfaz."
+    ],
+    "rules": [
+      {
+        "name": "The 10% Accent Rule",
+        "body": "El color Cobalt Precision nunca cubre más del 10% de la superficie de ninguna pantalla. Su escasez es lo que garantiza la atención inmediata sobre la acción clave.",
+        "section": "colors"
+      },
+      {
+        "name": "The Green Exclusivity Rule",
+        "body": "El verde está prohibido como adorno estético o fondo genérico; su uso es un premio visual reservado únicamente para reducción de pasivos, amortización y liquidez a favor.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Data Rule",
+        "body": "Todo valor monetario, porcentaje de CAT, tasa de interés, fecha de calendario o conteo de plazo debe portar font-variant-numeric: tabular-nums para garantizar alineación vertical perfecta en balances y comparativas.",
+        "section": "typography"
+      },
+      {
+        "name": "The Border-First Depth Rule",
+        "body": "La jerarquía entre capas se establece primero mediante contraste de fondos y bordes milimétricos. Las sombras solo aparecen como respuesta a un estado interactivo (hover, focus o modal activo).",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do alinear verticalmente todas las cantidades numéricas, saldos, fechas y tasas mediante tabular-nums.",
+      "Do reservar el color verde (#16a34a / #22c55e) exclusivamente para amortizaciones, abonos a capital, deudas liquidadas y excedentes de flujo.",
+      "Do asegurar que todo elemento interactivo implemente de forma visible sus cuatro estados: hover, focus-visible, active y disabled.",
+      "Do respetar la distribución cromática 60-30-10 en cada nueva pantalla o modal creado.",
+      "Do mantener el modo oscuro en tonalidades pizarra profunda equilibrada (#0b0f19 / #111827), evitando el negro absoluto (#000000)."
+    ],
+    "donts": [
+      "Don't utilizar emojis como sustitutos de iconos de interfaz; emplear siempre iconos vectoriales SVG de Lucide Icons.",
+      "Don't emplear gradientes morado/cian, glassmorphism excesivo o tarjetas flotantes descontextualizadas de estilo IA cliché.",
+      "Don't formatear montos financieros sin decimales consistentes o sin el símbolo de divisa correspondiente.",
+      "Don't omitir el desglose entre capital e intereses bancarios al registrar pagos o proyecciones.",
+      "Don't permitir scroll horizontal accidental en pantallas móviles; probar siempre la vista compacta primero."
+    ]
+  }
+}

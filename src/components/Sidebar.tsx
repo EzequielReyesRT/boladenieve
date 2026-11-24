@@ -176,10 +176,10 @@ export function Sidebar({
               <button
                 key={item.id}
                 onClick={() => handleSelectTab(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] cursor-pointer relative ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] cursor-pointer ${
                   isActive
-                    ? 'bg-[var(--brand-surface)] text-[var(--brand-text)] font-bold shadow-xs border-l-[3px] border-[var(--brand-primary)] pl-3'
-                    : 'text-[var(--text-secondary)] font-medium hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] active:scale-98'
+                    ? 'bg-[var(--brand-surface)] text-[var(--brand-text)] font-bold border border-[var(--brand-border)] shadow-xs'
+                    : 'text-[var(--text-secondary)] font-medium hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] border border-transparent active:scale-98'
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
@@ -200,7 +200,7 @@ export function Sidebar({
                     className={`px-2 py-0.5 rounded-full text-[10px] font-bold tabular-nums shrink-0 ${
                       isActive
                         ? 'bg-[var(--brand-primary)] text-white'
-                        : 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50'
+                        : 'bg-[var(--status-danger-surface)] text-[var(--status-danger)] border border-rose-200 dark:border-rose-900/50'
                     }`}
                   >
                     {item.badge}

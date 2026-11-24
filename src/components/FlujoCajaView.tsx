@@ -159,18 +159,19 @@ export function FlujoCajaView({
   return (
     <div className="space-y-6">
       {/* 1. Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-6 sm:p-8 shadow-xs text-[var(--text-primary)]">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[var(--brand-surface)] blur-3xl opacity-60" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--brand-surface)] border border-[var(--brand-border)] text-[var(--brand-text)] text-xs font-bold tracking-wide uppercase mb-3">
-              <Scale className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
-              <span>Presupuesto y Flujo de Caja</span>
+      <div className="rounded-2xl bg-[var(--surface-card)] border border-[var(--border-subtle)] p-6 sm:p-8 shadow-xs text-[var(--text-primary)]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
+                Ingresos, Gastos y Excedente
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--brand-surface)] border border-[var(--brand-border)] text-[var(--brand-text)] text-[11px] font-bold tracking-wide uppercase">
+                <Scale className="w-3 h-3 text-[var(--brand-primary)]" />
+                Flujo de Caja
+              </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
-              Ingresos, Gastos y Excedente
-            </h1>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl mt-1 leading-relaxed">
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
               Tu flujo de caja determina cuánto dinero libre tienes cada mes para acelerar la liquidación de tus tarjetas en cascada.
             </p>
           </div>
@@ -186,7 +187,7 @@ export function FlujoCajaView({
 
             <button
               onClick={() => onOpenNewMovimiento('Gasto')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-xs active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--status-danger)] hover:bg-rose-700 text-white text-xs font-bold shadow-xs active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--status-danger)] focus-visible:ring-offset-2 cursor-pointer"
             >
               <MinusCircle className="w-4 h-4" />
               <span>Registrar Gasto</span>

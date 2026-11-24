@@ -111,16 +111,11 @@ export function LoginPage() {
       <div className="w-full max-w-md relative z-10">
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--brand-surface)] border border-[var(--brand-border)] text-[var(--brand-text)] text-xs font-semibold tracking-wide uppercase mb-3 shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
-            <span>Método Bola de Nieve</span>
-          </div>
-
           <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-[var(--brand-primary)] flex items-center justify-center shadow-xs text-white">
             <TrendingDown className="w-7 h-7 text-white" />
           </div>
 
-          <h1 className="text-2xl font-extrabold tracking-tight text-[var(--text-primary)] mb-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-primary)] mb-1">
             Bola de Nieve
           </h1>
           <p className="text-xs text-[var(--text-muted)] max-w-sm mx-auto">
@@ -347,7 +342,7 @@ export function LoginPage() {
             <span>Base de Datos Segura</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <Sparkles className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
             <span>IIS 8083</span>
           </div>
         </div>

@@ -22,13 +22,13 @@ import {
 } from 'lucide-react';
 
 const DEBT_COLORS = [
-  { stroke: '#10b981', fill: '#10b981' }, // Emerald
+  { stroke: '#2563eb', fill: '#2563eb' }, // Cobalt Blue (Brand Primary)
+  { stroke: '#0d9488', fill: '#0d9488' }, // Teal
   { stroke: '#6366f1', fill: '#6366f1' }, // Indigo
-  { stroke: '#f59e0b', fill: '#f59e0b' }, // Amber
-  { stroke: '#ec4899', fill: '#ec4899' }, // Pink
-  { stroke: '#06b6d4', fill: '#06b6d4' }, // Cyan
-  { stroke: '#8b5cf6', fill: '#8b5cf6' }, // Purple
-  { stroke: '#f97316', fill: '#f97316' }, // Orange
+  { stroke: '#d97706', fill: '#d97706' }, // Amber
+  { stroke: '#e11d48', fill: '#e11d48' }, // Rose Wine
+  { stroke: '#0284c7', fill: '#0284c7' }, // Sky Blue
+  { stroke: '#16a34a', fill: '#16a34a' }, // Emerald
 ];
 
 interface TooltipProps {
@@ -128,7 +128,7 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
             </button>
             <button
               onClick={() => handleQuickAddExtra(1000)}
-              className="px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 cursor-pointer"
+              className="px-2.5 py-1 text-xs font-bold rounded-lg bg-[var(--surface-card)] text-[var(--brand-primary)] border border-[var(--brand-border)] hover:bg-[var(--brand-surface)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] active:scale-95 cursor-pointer"
             >
               +$1,000
             </button>
@@ -146,7 +146,7 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
             <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
               Tiempo para Cero Deudas
             </span>
-            <div className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1 tabular-nums">
+            <div className="text-xl sm:text-2xl font-black text-[var(--brand-primary)] mt-1 tabular-nums">
               {simulacion.meses_totales} meses
             </div>
             <div className="text-xs text-[var(--text-muted)] mt-0.5">
@@ -170,7 +170,7 @@ export function SnowballSimulatorView({ onOpenConfigModal }: SnowballSimulatorVi
             <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
               Intereses Proyectados
             </span>
-            <div className="text-xl sm:text-2xl font-black text-rose-500 mt-1 tabular-nums">
+            <div className="text-xl sm:text-2xl font-black text-[var(--status-danger)] mt-1 tabular-nums">
               {formatoMoneda(simulacion.total_intereses_proyectados)}
             </div>
             <div className="text-xs text-[var(--text-muted)] mt-0.5">

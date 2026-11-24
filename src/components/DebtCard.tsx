@@ -114,7 +114,7 @@ export function DebtCard({
           <span className="text-[10px] sm:text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">
             Saldo Restante
           </span>
-          <div className={`text-lg sm:text-xl font-extrabold tracking-tight tabular-nums mt-0.5 ${isPaid ? 'text-[var(--status-success)]' : 'text-rose-600 dark:text-rose-400'}`}>
+          <div className={`text-lg sm:text-xl font-extrabold tracking-tight tabular-nums mt-0.5 ${isPaid ? 'text-[var(--status-success)]' : 'text-[var(--status-danger)]'}`}>
             {formatoMoneda(deuda.saldo_actual)}
           </div>
         </div>

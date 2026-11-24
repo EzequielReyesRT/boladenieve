@@ -17,24 +17,24 @@ interface PaymentHistoryTableProps {
 
 const BADGE_COLORS: Record<TipoPago, { bg: string; text: string; border: string }> = {
   Extra: {
-    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
-    text: 'text-emerald-700 dark:text-emerald-300',
-    border: 'border-emerald-200 dark:border-emerald-800/60',
+    bg: 'bg-[var(--status-success-surface)]',
+    text: 'text-[var(--status-success-text)]',
+    border: 'border-[var(--status-success-border)]',
   },
   Minimo: {
-    bg: 'bg-slate-100 dark:bg-slate-800/70',
-    text: 'text-slate-700 dark:text-slate-300',
-    border: 'border-slate-200 dark:border-slate-700',
+    bg: 'bg-[var(--surface-subtle)]',
+    text: 'text-[var(--text-secondary)]',
+    border: 'border-[var(--border-subtle)]',
   },
   Liquidacion: {
-    bg: 'bg-purple-50 dark:bg-purple-950/40',
-    text: 'text-purple-700 dark:text-purple-300',
-    border: 'border-purple-200 dark:border-purple-800/60',
+    bg: 'bg-[var(--brand-surface)]',
+    text: 'text-[var(--brand-text)]',
+    border: 'border-[var(--brand-border)]',
   },
   Anualidad: {
-    bg: 'bg-amber-50 dark:bg-amber-950/40',
-    text: 'text-amber-700 dark:text-amber-300',
-    border: 'border-amber-200 dark:border-amber-800/60',
+    bg: 'bg-[var(--status-warning-surface)]',
+    text: 'text-[var(--status-warning)]',
+    border: 'border-amber-200 dark:border-amber-900/50',
   },
 };
 
