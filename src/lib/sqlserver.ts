@@ -17,6 +17,8 @@ function getSqlConfig(): sql.config | null {
     instanceName = parts[1];
   }
 
+  const isLocalServer = ['localhost', '127.0.0.1', '.'].includes(server.toLowerCase());
+
   return {
     user: process.env.DB_USER || 'sa',
     password: password,
@@ -24,8 +26,8 @@ function getSqlConfig(): sql.config | null {
     database: process.env.DB_NAME || 'BolaDeNieve',
     options: {
       instanceName: instanceName,
-      encrypt: false,
-      trustServerCertificate: true,
+      encrypt: process.env.DB_ENCRYPT === 'true' || !isLocalServer,
+      trustServerCertificate: process.env.DB_TRUST_CERT === 'true' || isLocalServer,
       enableArithAbort: true,
       connectTimeout: 5000,
       requestTimeout: 10000,
@@ -65,20 +67,6 @@ async function getPool(): Promise<sql.ConnectionPool | null> {
   }
 
   return poolPromise;
-}
-
-/**
- * Ejecuta una consulta arbitraria en SQL Server de forma controlada a través del pool TDS
- */
-export async function executeSqlServerQuery(query: string): Promise<boolean> {
-  try {
-    const pool = await getPool();
-    if (!pool) return false;
-    await pool.request().query(query);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 /**

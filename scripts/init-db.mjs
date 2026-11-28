@@ -89,6 +89,23 @@ async function init() {
       );
     `);
 
+    // 4.1 Configuracion del Sistema (Banderas en BD)
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS configuracion_sistema (
+        clave VARCHAR(100) PRIMARY KEY,
+        valor_booleano BOOLEAN NOT NULL DEFAULT TRUE,
+        descripcion TEXT,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      INSERT INTO configuracion_sistema (clave, valor_booleano, descripcion)
+      VALUES (
+        'registro_habilitado',
+        TRUE,
+        'Bandera para habilitar (true) o deshabilitar (false) el registro de nuevos usuarios'
+      )
+      ON CONFLICT (clave) DO NOTHING;
+    `);
+
     // 5. Vista de saldos calculados
     await db.exec(`
       CREATE OR REPLACE VIEW vista_resumen_deudas AS

@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getSessionUser } from '@/lib/auth';
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
 
     const { data } = validation;
     const db = getDb();
-    const id = data.id || `flujo-${Date.now()}`;
+    const id = `flujo-${crypto.randomUUID()}`;
     const userId = session.id;
 
     // 1. Guardar en base de datos local PGlite

@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getSessionUser } from '@/lib/auth';
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
 
     const { data } = validation;
     const db = getDb();
-    const id = data.id || `d-${Date.now()}`;
+    const id = `d-${crypto.randomUUID()}`;
     const userId = session.id;
 
     await db.query(

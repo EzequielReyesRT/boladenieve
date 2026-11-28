@@ -121,17 +121,63 @@ ALTER TABLE public.configuracion_usuario ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.deudas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bitacora_pagos ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Lectura usuarios" ON public.usuarios FOR SELECT USING (true);
-CREATE POLICY "Escritura usuarios" ON public.usuarios FOR ALL USING (true);
+-- Proteger estrictamente la tabla de usuarios: solo el servidor (service_role) puede acceder
+REVOKE ALL ON public.usuarios FROM anon, authenticated;
+GRANT ALL ON public.usuarios TO service_role;
 
-CREATE POLICY "Lectura configuracion" ON public.configuracion_usuario FOR SELECT USING (true);
-CREATE POLICY "Escritura configuracion" ON public.configuracion_usuario FOR ALL USING (true);
+-- Políticas para configuracion_usuario (acceso restringido al propietario autenticado)
+CREATE POLICY "Configuracion_Select_Owner" ON public.configuracion_usuario
+    FOR SELECT TO authenticated
+    USING (auth.uid()::text = user_id);
 
-CREATE POLICY "Lectura deudas" ON public.deudas FOR SELECT USING (true);
-CREATE POLICY "Escritura deudas" ON public.deudas FOR ALL USING (true);
+CREATE POLICY "Configuracion_Insert_Owner" ON public.configuracion_usuario
+    FOR INSERT TO authenticated
+    WITH CHECK (auth.uid()::text = user_id);
 
-CREATE POLICY "Lectura bitacora" ON public.bitacora_pagos FOR SELECT USING (true);
-CREATE POLICY "Escritura bitacora" ON public.bitacora_pagos FOR ALL USING (true);
+CREATE POLICY "Configuracion_Update_Owner" ON public.configuracion_usuario
+    FOR UPDATE TO authenticated
+    USING (auth.uid()::text = user_id)
+    WITH CHECK (auth.uid()::text = user_id);
+
+CREATE POLICY "Configuracion_Delete_Owner" ON public.configuracion_usuario
+    FOR DELETE TO authenticated
+    USING (auth.uid()::text = user_id);
+
+-- Políticas para deudas (acceso restringido al propietario autenticado)
+CREATE POLICY "Deudas_Select_Owner" ON public.deudas
+    FOR SELECT TO authenticated
+    USING (auth.uid()::text = user_id);
+
+CREATE POLICY "Deudas_Insert_Owner" ON public.deudas
+    FOR INSERT TO authenticated
+    WITH CHECK (auth.uid()::text = user_id);
+
+CREATE POLICY "Deudas_Update_Owner" ON public.deudas
+    FOR UPDATE TO authenticated
+    USING (auth.uid()::text = user_id)
+    WITH CHECK (auth.uid()::text = user_id);
+
+CREATE POLICY "Deudas_Delete_Owner" ON public.deudas
+    FOR DELETE TO authenticated
+    USING (auth.uid()::text = user_id);
+
+-- Políticas para bitacora_pagos (acceso restringido al propietario autenticado)
+CREATE POLICY "Bitacora_Select_Owner" ON public.bitacora_pagos
+    FOR SELECT TO authenticated
+    USING (auth.uid()::text = user_id);
+
+CREATE POLICY "Bitacora_Insert_Owner" ON public.bitacora_pagos
+    FOR INSERT TO authenticated
+    WITH CHECK (auth.uid()::text = user_id);
+
+CREATE POLICY "Bitacora_Update_Owner" ON public.bitacora_pagos
+    FOR UPDATE TO authenticated
+    USING (auth.uid()::text = user_id)
+    WITH CHECK (auth.uid()::text = user_id);
+
+CREATE POLICY "Bitacora_Delete_Owner" ON public.bitacora_pagos
+    FOR DELETE TO authenticated
+    USING (auth.uid()::text = user_id);
 
 -- ------------------------------------------------------------------------------
 -- 6. COPIA EXACTA DE TUS DATOS (USUARIOS, CONFIGURACIÓN, DEUDAS Y BITÁCORA)

@@ -1,9 +1,25 @@
 import { NextResponse } from 'next/server';
-import { registerNewUser, generateToken, COOKIE_NAME } from '@/lib/auth';
+import {
+  registerNewUser,
+  isRegistrationEnabled,
+  generateToken,
+  COOKIE_NAME,
+} from '@/lib/auth';
 import { getClientIp, checkRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    const registrationEnabled = await isRegistrationEnabled();
+    if (!registrationEnabled) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'El registro de nuevos usuarios está deshabilitado.',
+        },
+        { status: 403 }
+      );
+    }
+
     // Limitación de tasa para creación de cuentas (5 registros por hora por IP)
     const ip = getClientIp(request);
     const rateLimit = checkRateLimit(`register:${ip}`, 5, 3600);
@@ -48,7 +64,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await registerNewUser(nombre, email, password);
+    const result = await registerNewUser(nombre, email, password, {
+      skipFlagCheck: true,
+    });
 
     if (result.error || !result.user) {
       return NextResponse.json(

@@ -3,29 +3,38 @@ interface RateLimitRecord {
   resetAt: number;
 }
 
-// Almacenamiento en memoria para limitación de tasa
+// Almacenamiento en memoria para limitación de tasa con límite máximo de entradas
 const rateLimitStore = new Map<string, RateLimitRecord>();
+const MAX_RATE_LIMIT_ENTRIES = 10_000;
 
 /**
- * Obtiene la dirección IP del cliente a partir de los encabezados HTTP
+ * Obtiene la dirección IP del cliente de forma segura.
+ * Solo confía en cabeceras de proxy cuando se ejecuta detrás de un proxy confiable explícito.
  */
 export function getClientIp(request: Request): string {
-  // 1. Cloudflare header prioritario (no manipulable por el cliente si el tráfico pasa por CF)
-  const cfIp = request.headers.get('cf-connecting-ip');
-  if (cfIp) return cfIp.trim();
+  const trustProxy =
+    process.env.TRUST_PROXY === 'true' ||
+    process.env.VERCEL === '1' ||
+    process.env.CF_PAGES === '1';
 
-  // 2. Real IP de proxies intermedios configurados
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return realIp.trim();
+  if (trustProxy) {
+    // 1. Cloudflare header prioritario (sobrescrito por CF en el edge)
+    const cfIp = request.headers.get('cf-connecting-ip');
+    if (cfIp) return cfIp.trim();
 
-  // 3. X-Forwarded-For (tomar la última IP confiable si hay cadena o la primera)
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    const ips = forwardedFor.split(',').map((ip) => ip.trim()).filter(Boolean);
-    if (ips.length > 0) return ips[0];
+    // 2. Real IP de proxy inverso confiable
+    const realIp = request.headers.get('x-real-ip');
+    if (realIp) return realIp.trim();
+
+    // 3. X-Forwarded-For
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    if (forwardedFor) {
+      const ips = forwardedFor.split(',').map((ip) => ip.trim()).filter(Boolean);
+      if (ips.length > 0) return ips[0];
+    }
   }
 
-  return '127.0.0.1';
+  return 'direct-client';
 }
 
 /**
@@ -44,6 +53,12 @@ export function checkRateLimit(
 
   // Si no existe o la ventana expiró, iniciar nuevo contador
   if (!existing || now > existing.resetAt) {
+    if (rateLimitStore.size >= MAX_RATE_LIMIT_ENTRIES) {
+      const oldestKey = rateLimitStore.keys().next().value;
+      if (oldestKey !== undefined) {
+        rateLimitStore.delete(oldestKey);
+      }
+    }
     const resetAt = now + windowSeconds * 1000;
     rateLimitStore.set(key, { count: 1, resetAt });
     return {

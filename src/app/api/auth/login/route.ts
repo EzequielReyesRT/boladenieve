@@ -14,14 +14,17 @@ export async function POST(request: Request) {
       );
     }
 
-    // Limitación de tasa contra ataques de fuerza bruta (5 intentos por 15 minutos)
+    // Limitación de tasa contra ataques de fuerza bruta (por IP+usuario y por cuenta)
     const ip = getClientIp(request);
     const cleanUser = String(username).trim().toLowerCase();
     const rateLimitKey = `login:${ip}:${cleanUser}`;
+    const accountRateLimitKey = `login:account:${cleanUser}`;
     const rateLimit = checkRateLimit(rateLimitKey, 5, 900);
+    const accountRateLimit = checkRateLimit(accountRateLimitKey, 10, 900);
 
-    if (!rateLimit.allowed) {
-      const minutes = Math.ceil(rateLimit.resetInSeconds / 60);
+    if (!rateLimit.allowed || !accountRateLimit.allowed) {
+      const resetInSeconds = Math.max(rateLimit.resetInSeconds, accountRateLimit.resetInSeconds);
+      const minutes = Math.ceil(resetInSeconds / 60);
       return NextResponse.json(
         {
           success: false,
@@ -30,7 +33,7 @@ export async function POST(request: Request) {
         {
           status: 429,
           headers: {
-            'Retry-After': String(rateLimit.resetInSeconds),
+            'Retry-After': String(resetInSeconds),
           },
         }
       );
@@ -43,14 +46,15 @@ export async function POST(request: Request) {
         {
           success: false,
           error: 'Usuario o contraseña incorrectos.',
-          intentosRestantes: rateLimit.remaining,
+          intentosRestantes: Math.min(rateLimit.remaining, accountRateLimit.remaining),
         },
         { status: 401 }
       );
     }
 
-    // Inicio de sesión exitoso: reiniciar contador de intentos fallidos
+    // Inicio de sesión exitoso: reiniciar contadores de intentos fallidos
     resetRateLimit(rateLimitKey);
+    resetRateLimit(accountRateLimitKey);
 
     const days = rememberMe ? 30 : 1;
     const token = generateToken(user, days);

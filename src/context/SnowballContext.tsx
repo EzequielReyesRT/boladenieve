@@ -323,12 +323,18 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       }
     } else {
       try {
-        await fetch('/api/deudas', {
+        const res = await fetch('/api/deudas', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(debtObj),
         });
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.id && json.id !== id) {
+            setDeudas((prev) => prev.map((d) => (d.id === id ? { ...d, id: json.id } : d)));
+          }
+        }
       } catch (e) {
         console.error('Error al insertar deuda en base local:', e);
       }
@@ -425,12 +431,22 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       }
     } else {
       try {
-        await fetch('/api/pagos', {
+        const res = await fetch('/api/pagos', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(paymentObj),
         });
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.id && json.id !== id) {
+            const serverFlujoId = `flujo-pago-${json.id}`;
+            setBitacora((prev) => prev.map((p) => (p.id === id ? { ...p, id: json.id } : p)));
+            setMovimientosFlujo((prev) =>
+              prev.map((m) => (m.id === flujoId ? { ...m, id: serverFlujoId } : m))
+            );
+          }
+        }
       } catch (e) {
         console.error('Error al registrar pago en base local:', e);
       }
@@ -482,12 +498,18 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       }
     } else {
       try {
-        await fetch('/api/flujo', {
+        const res = await fetch('/api/flujo', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(movObj),
         });
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.id && json.id !== id) {
+            setMovimientosFlujo((prev) => prev.map((m) => (m.id === id ? { ...m, id: json.id } : m)));
+          }
+        }
       } catch (e) {
         console.error('Error al registrar movimiento en base local:', e);
       }

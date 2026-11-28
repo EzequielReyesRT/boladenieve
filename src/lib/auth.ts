@@ -8,34 +8,30 @@ import { Usuario } from '@/types';
 const COOKIE_NAME = 'bola_session';
 
 // Obtiene la clave de firma de sesión de forma segura y criptográficamente robusta
-let cachedSecret: string | null = null;
+declare global {
+  var __bola_session_secret__: string | undefined;
+}
 
 export function getSessionSecret(): string {
-  if (cachedSecret) return cachedSecret;
+  if (globalThis.__bola_session_secret__) return globalThis.__bola_session_secret__;
 
-  const envSecret = process.env.SESSION_SECRET;
-  const INSECURE_DEFAULT = 'bola-de-nieve-secure-session-key-2026-financial-freedom';
+  const envSecret = process.env.SESSION_SECRET?.trim();
 
-  // Si se definió en variables de entorno y no es el valor por defecto inseguro
-  if (envSecret && envSecret.trim().length >= 32 && envSecret !== INSECURE_DEFAULT) {
-    cachedSecret = envSecret.trim();
-    return cachedSecret;
+  if (envSecret && envSecret.length >= 32) {
+    globalThis.__bola_session_secret__ = envSecret;
+    return globalThis.__bola_session_secret__;
   }
 
-  // En producción, NUNCA usar la clave insegura conocida en el repositorio
+  // En producción, advertir si falta SESSION_SECRET y generar una clave efímera de alta entropía
   if (process.env.NODE_ENV === 'production') {
     console.error(
-      '⚠️ [SEGURIDAD CRÍTICA] SESSION_SECRET no configurada en variables de entorno de producción (ej. panel de Vercel). ' +
-      'Se ha generado una clave efímera para esta instancia, pero en entornos serverless multi-instancia ' +
-      'debes definir SESSION_SECRET (mínimo 32 caracteres) para evitar invalidación intermitente de sesiones.'
+      '⚠️ [SEGURIDAD CRÍTICA] SESSION_SECRET no configurada (mínimo 32 caracteres). ' +
+      'Se ha generado una clave efímera para esta instancia.'
     );
-    cachedSecret = crypto.randomBytes(64).toString('hex');
-    return cachedSecret;
   }
 
-  // En desarrollo local
-  cachedSecret = envSecret || 'dev-only-local-secret-boladenieve-key-32chars';
-  return cachedSecret;
+  globalThis.__bola_session_secret__ = crypto.randomBytes(64).toString('hex');
+  return globalThis.__bola_session_secret__;
 }
 
 export interface UserRow {
@@ -101,8 +97,8 @@ export function verifyToken(token: string): SessionPayload | null {
       Buffer.from(payloadB64, 'base64url').toString('utf8')
     );
 
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-      return null; // Expirado
+    if (typeof payload.exp !== 'number' || payload.exp <= Math.floor(Date.now() / 1000)) {
+      return null; // Expirado o sin expiración válida
     }
 
     return payload;
@@ -143,7 +139,7 @@ export async function authenticateUser(
       const { data, error } = await supabase
         .from('usuarios')
         .select('*')
-        .or(`email.ilike.${cleanInput},id.eq.${cleanInput}`)
+        .or(`email.eq.${cleanInput},id.eq.${cleanInput}`)
         .maybeSingle();
 
       if (data && !error) {
@@ -199,12 +195,60 @@ export async function authenticateUser(
   };
 }
 
+const REGISTRATION_FLAG_KEY = 'registro_habilitado';
+
+/**
+ * Consulta en la base de datos si el registro de nuevos usuarios está habilitado.
+ * Por defecto devuelve `true` si la bandera aún no existe.
+ */
+export async function isRegistrationEnabled(): Promise<boolean> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('configuracion_sistema')
+        .select('valor_booleano')
+        .eq('clave', REGISTRATION_FLAG_KEY)
+        .maybeSingle();
+
+      if (!error && data && typeof data.valor_booleano === 'boolean') {
+        return data.valor_booleano;
+      }
+    } catch (e) {
+      console.warn('Advertencia al consultar bandera de registro en Supabase:', e);
+    }
+    return true;
+  }
+
+  try {
+    const db = getDb();
+    const res = await db.query<{ valor_booleano: boolean }>(
+      `SELECT valor_booleano FROM configuracion_sistema WHERE clave = $1 LIMIT 1`,
+      [REGISTRATION_FLAG_KEY]
+    );
+    if (res.rows.length > 0 && typeof res.rows[0].valor_booleano === 'boolean') {
+      return res.rows[0].valor_booleano;
+    }
+  } catch {
+    // Si la tabla aún no existe en local, permitir por compatibilidad
+  }
+
+  return true;
+}
+
 // Registra un nuevo usuario en la base de datos
 export async function registerNewUser(
   nombre: string,
   emailOrUsername: string,
-  passwordPlain: string
+  passwordPlain: string,
+  options?: { skipFlagCheck?: boolean }
 ): Promise<{ user?: Usuario; error?: string }> {
+  if (!options?.skipFlagCheck) {
+    const registrationEnabled = await isRegistrationEnabled();
+    if (!registrationEnabled) {
+      return { error: 'El registro de nuevos usuarios está deshabilitado.' };
+    }
+  }
+
   const cleanEmail = emailOrUsername.trim().toLowerCase();
   const cleanNombre = nombre.trim();
 
@@ -231,7 +275,7 @@ export async function registerNewUser(
       const { data: existing } = await supabase
         .from('usuarios')
         .select('id')
-        .or(`email.ilike.${cleanEmail},id.eq.${cleanEmail}`)
+        .or(`email.eq.${cleanEmail},id.eq.${cleanEmail}`)
         .maybeSingle();
 
       if (existing) {

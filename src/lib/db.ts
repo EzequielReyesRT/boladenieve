@@ -24,6 +24,19 @@ export function getDb(): PGlite {
         UPDATE bitacora_pagos SET user_id = 'u-admin' WHERE user_id IS NULL;
         UPDATE configuracion_usuario SET user_id = 'u-admin' WHERE user_id IS NULL;
         UPDATE movimientos_flujo SET user_id = 'u-admin' WHERE user_id IS NULL;
+        CREATE TABLE IF NOT EXISTS configuracion_sistema (
+          clave VARCHAR(100) PRIMARY KEY,
+          valor_booleano BOOLEAN NOT NULL DEFAULT TRUE,
+          descripcion TEXT,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+        INSERT INTO configuracion_sistema (clave, valor_booleano, descripcion)
+        VALUES (
+          'registro_habilitado',
+          TRUE,
+          'Bandera para habilitar (true) o deshabilitar (false) el registro de nuevos usuarios'
+        )
+        ON CONFLICT (clave) DO NOTHING;
       `)
       .catch(() => {
         // Ignorar si las tablas aún no se han inicializado

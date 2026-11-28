@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getSessionUser } from '@/lib/auth';
@@ -69,7 +70,7 @@ export async function POST(request: Request) {
 
     const { data } = validation;
     const db = getDb();
-    const id = data.id || `p-${Date.now()}`;
+    const id = `p-${crypto.randomUUID()}`;
     const userId = session.id;
 
     // Prevención de IDOR: comprobar que la deuda destino pertenece al usuario autenticado
@@ -124,6 +125,7 @@ export async function POST(request: Request) {
         monto = EXCLUDED.monto,
         fecha = EXCLUDED.fecha,
         descripcion = EXCLUDED.descripcion
+      WHERE movimientos_flujo.user_id = EXCLUDED.user_id
       `,
       [
         flujoId,
@@ -138,7 +140,7 @@ export async function POST(request: Request) {
     );
 
     // 3. Replicar a SQL Server si está disponible (método seguro sin shell ni credenciales expuestas)
-    await syncPagoInsert(data, nombreTarjeta);
+    await syncPagoInsert({ ...data, id }, nombreTarjeta);
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
