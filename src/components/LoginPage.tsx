@@ -18,11 +18,12 @@ import {
   CheckCircle2,
   AlertCircle,
   UserPlus,
-  LogIn
+  LogIn,
+  UserCheck
 } from 'lucide-react';
 
 export function LoginPage() {
-  const { login, register } = useAuth();
+  const { login, loginAsGuest, register } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -60,7 +61,18 @@ export function LoginPage() {
   const [rememberMe, setRememberMe] = useState(true);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleGuestLogin = async () => {
+    setErrorMessage(null);
+    setIsGuestLoading(true);
+    const result = await loginAsGuest();
+    if (!result.success) {
+      setErrorMessage(result.error || 'No se pudo iniciar sesión como invitado.');
+    }
+    setIsGuestLoading(false);
+  };
 
   const handleSwitchMode = (newMode: 'login' | 'register') => {
     if (newMode === 'register' && !registrationEnabled) {
@@ -315,10 +327,10 @@ export function LoginPage() {
             {/* Botón Principal */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isGuestLoading}
               className="w-full mt-2 py-3 px-4 rounded-xl font-bold text-sm text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] active:scale-98 disabled:opacity-50 disabled:pointer-events-none transition-all shadow-xs flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2"
             >
-              {isLoading ? (
+              {isLoading || isGuestLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   <span>{mode === 'login' ? 'Verificando...' : 'Creando cuenta...'}</span>
@@ -331,6 +343,27 @@ export function LoginPage() {
               )}
             </button>
           </form>
+
+          {mode === 'login' && (
+            <button
+              type="button"
+              onClick={handleGuestLogin}
+              disabled={isLoading || isGuestLoading}
+              className="w-full mt-3 py-2.5 px-4 rounded-xl font-semibold text-sm bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] hover:bg-[var(--surface-card)] active:scale-98 disabled:opacity-50 disabled:pointer-events-none transition-all flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
+            >
+              {isGuestLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-[var(--text-muted)]/30 border-t-[var(--text-primary)] rounded-full animate-spin" />
+                  <span>Iniciando acceso invitado...</span>
+                </>
+              ) : (
+                <>
+                  <UserCheck className="w-4 h-4" />
+                  <span>Acceso Invitado</span>
+                </>
+              )}
+            </button>
+          )}
 
           {/* Enlace para cambiar de modo al pie o aviso de registro deshabilitado */}
           <div className="mt-5 pt-4 border-t border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">

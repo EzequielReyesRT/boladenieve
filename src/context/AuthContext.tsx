@@ -8,6 +8,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (username: string, password: string, rememberMe?: boolean) => Promise<{ success: boolean; error?: string }>;
+  loginAsGuest: () => Promise<{ success: boolean; error?: string }>;
   register: (nombre: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -98,6 +99,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loginAsGuest = async () => {
+    try {
+      const res = await fetch('/api/auth/guest', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.user) {
+        setUser(data.user);
+        return { success: true };
+      }
+
+      return { success: false, error: data.error || 'No se pudo iniciar sesión como invitado.' };
+    } catch {
+      return { success: false, error: 'Error de conexión con el servidor.' };
+    }
+  };
+
   const register = async (nombre: string, email: string, password: string) => {
     setIsLoading(true);
     try {
@@ -145,6 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!user,
         isLoading,
         login,
+        loginAsGuest,
         register,
         logout,
         checkAuth,
