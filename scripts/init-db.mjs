@@ -1,4 +1,6 @@
 import { PGlite } from '@electric-sql/pglite';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -136,11 +138,17 @@ async function init() {
     // Verificar si ya hay usuario admin
     const userCheck = await db.query('SELECT COUNT(*) as count FROM usuarios');
     if (parseInt(userCheck.rows[0].count, 10) === 0) {
-      console.log('👤 Creando usuario administrador inicial (admin / Admin123*)...');
-      await db.query(`
-        INSERT INTO usuarios (id, nombre, email, password_hash, rol)
-        VALUES ('u-admin', 'Ezequiel Reyes', 'admin', '$2b$10$5c1HIHHnZXcePOKEQuob4uQriiHQyqa6DfrgTJMbwDxTiDBGyUPem', 'admin')
-      `);
+      const envPass = process.env.ADMIN_INITIAL_PASSWORD?.trim();
+      const adminPassword = envPass || crypto.randomBytes(12).toString('base64url');
+      const passwordHash = await bcrypt.hash(adminPassword, 12);
+      console.log('👤 Creando usuario administrador inicial (admin)...');
+      if (!envPass) {
+        console.log(`🔑 Contraseña temporal generada para admin: ${adminPassword}`);
+      }
+      await db.query(
+        `INSERT INTO usuarios (id, nombre, email, password_hash, rol) VALUES ($1, $2, $3, $4, $5)`,
+        ['u-admin', 'Ezequiel Reyes', 'admin', passwordHash, 'admin']
+      );
     }
 
     // Verificar si ya hay datos de configuración

@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const securityHeaders = [
   {
     key: 'X-Frame-Options',
@@ -29,11 +31,15 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+      isProd
+        ? "script-src 'self' 'unsafe-inline'"
+        : "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co http://localhost:*",
+      isProd
+        ? "connect-src 'self' https://*.supabase.co wss://*.supabase.co"
+        : "connect-src 'self' https://*.supabase.co wss://*.supabase.co http://localhost:*",
       "frame-ancestors 'none'",
     ].join('; '),
   },
