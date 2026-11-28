@@ -7,6 +7,18 @@ import {
 } from '@/lib/auth';
 import { getClientIp, checkRateLimit } from '@/lib/rate-limit';
 
+export async function GET() {
+  const registrationEnabled = await isRegistrationEnabled();
+  return NextResponse.json(
+    { registrationEnabled },
+    {
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    }
+  );
+}
+
 export async function POST(request: Request) {
   try {
     const registrationEnabled = await isRegistrationEnabled();

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import {
@@ -26,6 +26,30 @@ export function LoginPage() {
   const { theme, toggleTheme } = useTheme();
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [registrationEnabled, setRegistrationEnabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    let active = true;
+
+    fetch('/api/auth/register', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!active || !data || typeof data.registrationEnabled !== 'boolean') {
+          return;
+        }
+        setRegistrationEnabled(data.registrationEnabled);
+        if (!data.registrationEnabled) {
+          setMode('login');
+        }
+      })
+      .catch(() => {
+        // Mantener valor por defecto si falla la consulta
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Form fields
   const [nombre, setNombre] = useState('');
@@ -39,6 +63,9 @@ export function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSwitchMode = (newMode: 'login' | 'register') => {
+    if (newMode === 'register' && !registrationEnabled) {
+      return;
+    }
     setMode(newMode);
     setErrorMessage(null);
     setPassword('');
@@ -128,32 +155,34 @@ export function LoginPage() {
         {/* Card Form */}
         <div className="bg-[var(--surface-card)] border border-[var(--border-subtle)] rounded-2xl p-6 sm:p-7 shadow-sm">
           {/* Selector de Pestañas Login / Registro */}
-          <div className="flex p-1 bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-xl mb-5">
-            <button
-              type="button"
-              onClick={() => handleSwitchMode('login')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] ${
-                mode === 'login'
-                  ? 'bg-[var(--brand-primary)] text-white shadow-xs'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Iniciar Sesión</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSwitchMode('register')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] ${
-                mode === 'register'
-                  ? 'bg-[var(--brand-primary)] text-white shadow-xs'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>Registrarse</span>
-            </button>
-          </div>
+          {registrationEnabled && (
+            <div className="flex p-1 bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-xl mb-5">
+              <button
+                type="button"
+                onClick={() => handleSwitchMode('login')}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] ${
+                  mode === 'login'
+                    ? 'bg-[var(--brand-primary)] text-white shadow-xs'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Iniciar Sesión</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSwitchMode('register')}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] ${
+                  mode === 'register'
+                    ? 'bg-[var(--brand-primary)] text-white shadow-xs'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Registrarse</span>
+              </button>
+            </div>
+          )}
 
           <div className="mb-4">
             <h2 className="text-base font-bold text-[var(--text-primary)]">
@@ -303,9 +332,14 @@ export function LoginPage() {
             </button>
           </form>
 
-          {/* Enlace para cambiar de modo al pie */}
+          {/* Enlace para cambiar de modo al pie o aviso de registro deshabilitado */}
           <div className="mt-5 pt-4 border-t border-[var(--border-subtle)] text-center text-xs text-[var(--text-muted)]">
-            {mode === 'login' ? (
+            {!registrationEnabled ? (
+              <div className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-[var(--surface-subtle)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
+                <Lock className="w-3.5 h-3.5 shrink-0 text-[var(--text-muted)]" />
+                <span>El registro de nuevos usuarios no está permitido por el momento.</span>
+              </div>
+            ) : mode === 'login' ? (
               <p>
                 ¿No tienes una cuenta aún?{' '}
                 <button
