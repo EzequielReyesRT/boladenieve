@@ -19,6 +19,7 @@ export function getDb(): PGlite {
         ALTER TABLE deudas ADD COLUMN IF NOT EXISTS user_id TEXT;
         ALTER TABLE bitacora_pagos ADD COLUMN IF NOT EXISTS user_id TEXT;
         ALTER TABLE configuracion_usuario ADD COLUMN IF NOT EXISTS user_id TEXT;
+        ALTER TABLE movimientos_flujo ADD COLUMN IF NOT EXISTS user_id TEXT;
         UPDATE deudas SET user_id = 'u-admin' WHERE user_id IS NULL;
         UPDATE bitacora_pagos SET user_id = 'u-admin' WHERE user_id IS NULL;
         UPDATE configuracion_usuario SET user_id = 'u-admin' WHERE user_id IS NULL;

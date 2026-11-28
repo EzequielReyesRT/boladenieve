@@ -25,13 +25,10 @@ export async function GET() {
     }
 
     const db = getDb();
-    const query =
-      session.rol === 'admin'
-        ? 'SELECT * FROM bitacora_pagos ORDER BY fecha_pago DESC'
-        : 'SELECT * FROM bitacora_pagos WHERE user_id = $1 ORDER BY fecha_pago DESC';
-    const params = session.rol === 'admin' ? [] : [session.id];
-
-    const res = await db.query<PagoRow>(query, params);
+    const res = await db.query<PagoRow>(
+      'SELECT * FROM bitacora_pagos WHERE user_id = $1 ORDER BY fecha_pago DESC',
+      [session.id]
+    );
     const pagos: BitacoraPago[] = res.rows.map((row) => ({
       id: row.id,
       deuda_id: row.deuda_id,
@@ -44,7 +41,9 @@ export async function GET() {
       created_at: row.created_at,
     }));
 
-    return NextResponse.json(pagos);
+    return NextResponse.json(pagos, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
+    });
   } catch (error) {
     console.error('Error fetching pagos from DB:', error);
     return NextResponse.json({ error: 'Error al consultar pagos' }, { status: 500 });
@@ -83,11 +82,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'La deuda especificada no existe.' }, { status: 404 });
     }
 
-    if (
-      session.rol !== 'admin' &&
-      deudaRes.rows[0].user_id &&
-      deudaRes.rows[0].user_id !== session.id
-    ) {
+    if (deudaRes.rows[0].user_id !== session.id) {
       return NextResponse.json(
         { error: 'Acceso denegado: no puedes registrar pagos para deudas de otro usuario.' },
         { status: 403 }
@@ -174,11 +169,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Pago no encontrado' }, { status: 404 });
     }
 
-    if (
-      session.rol !== 'admin' &&
-      existing.rows[0].user_id &&
-      existing.rows[0].user_id !== session.id
-    ) {
+    if (existing.rows[0].user_id !== session.id) {
       return NextResponse.json(
         { error: 'Acceso denegado: no tienes permiso para eliminar este pago.' },
         { status: 403 }

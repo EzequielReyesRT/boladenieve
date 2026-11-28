@@ -35,13 +35,8 @@ export async function GET(request: Request) {
 
     const db = getDb();
     let query = 'SELECT * FROM movimientos_flujo';
-    const params: (string | number)[] = [];
-    const conditions: string[] = [];
-
-    if (session.rol !== 'admin') {
-      params.push(session.id);
-      conditions.push(`user_id = $${params.length}`);
-    }
+    const params: (string | number)[] = [session.id];
+    const conditions: string[] = ['user_id = $1'];
 
     if (mes && anio) {
       params.push(parseInt(mes, 10));
@@ -51,9 +46,7 @@ export async function GET(request: Request) {
       conditions.push(`EXTRACT(MONTH FROM fecha::date) = $${mesIdx} AND EXTRACT(YEAR FROM fecha::date) = $${anioIdx}`);
     }
 
-    if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ');
-    }
+    query += ' WHERE ' + conditions.join(' AND ');
     query += ' ORDER BY fecha DESC, created_at DESC';
 
     const res = await db.query<MovimientoRow>(query, params);
@@ -71,7 +64,9 @@ export async function GET(request: Request) {
       updated_at: row.updated_at,
     }));
 
-    return NextResponse.json(movimientos);
+    return NextResponse.json(movimientos, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
+    });
   } catch (error) {
     console.error('Error fetching movimientos de flujo:', error);
     return NextResponse.json({ error: 'Error al consultar flujo de caja' }, { status: 500 });
@@ -169,11 +164,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Movimiento no encontrado' }, { status: 404 });
     }
 
-    if (
-      session.rol !== 'admin' &&
-      existing.rows[0].user_id &&
-      existing.rows[0].user_id !== session.id
-    ) {
+    if (existing.rows[0].user_id !== session.id) {
       return NextResponse.json(
         { error: 'Acceso denegado: no tienes permiso para modificar este movimiento.' },
         { status: 403 }
@@ -244,11 +235,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Movimiento no encontrado' }, { status: 404 });
     }
 
-    if (
-      session.rol !== 'admin' &&
-      existing.rows[0].user_id &&
-      existing.rows[0].user_id !== session.id
-    ) {
+    if (existing.rows[0].user_id !== session.id) {
       return NextResponse.json(
         { error: 'Acceso denegado: no tienes permiso para eliminar este movimiento.' },
         { status: 403 }

@@ -24,29 +24,31 @@ export async function GET() {
     }
 
     const db = getDb();
-    let res = await db.query<ConfigRow>(
+    const res = await db.query<ConfigRow>(
       'SELECT * FROM configuracion_usuario WHERE user_id = $1 LIMIT 1',
       [session.id]
     );
 
-    // Si es admin y no tiene configuración individual específica, usar la configuración general existente
-    if (res.rows.length === 0 && session.rol === 'admin') {
-      res = await db.query<ConfigRow>('SELECT * FROM configuracion_usuario LIMIT 1');
-    }
-
     if (res.rows.length === 0) {
-      return NextResponse.json(null);
+      return NextResponse.json(null, {
+        headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
+      });
     }
 
     const row = res.rows[0];
-    return NextResponse.json({
-      ...row,
-      pago_extra_mensual: Number(row.pago_extra_mensual),
-      mes_calendario_inicio: Number(row.mes_calendario_inicio),
-      anio_inicio: Number(row.anio_inicio || 2026),
-      aportacion_unica_anual: Number(row.aportacion_unica_anual),
-      mes_aportacion_unica: Number(row.mes_aportacion_unica),
-    });
+    return NextResponse.json(
+      {
+        ...row,
+        pago_extra_mensual: Number(row.pago_extra_mensual),
+        mes_calendario_inicio: Number(row.mes_calendario_inicio),
+        anio_inicio: Number(row.anio_inicio || 2026),
+        aportacion_unica_anual: Number(row.aportacion_unica_anual),
+        mes_aportacion_unica: Number(row.mes_aportacion_unica),
+      },
+      {
+        headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
+      }
+    );
   } catch (error) {
     console.error('Error fetching config from DB:', error);
     return NextResponse.json({ error: 'Error al consultar configuración' }, { status: 500 });
@@ -72,20 +74,14 @@ export async function POST(request: Request) {
 
     const { data } = validation;
     const db = getDb();
-    const configId = data.id || `config-${session.id}`;
-
-    // Prevención de IDOR: si se proporciona un ID existente, verificar propiedad
-    if (data.id) {
+    // Prevención de IDOR: siempre asociar al usuario autenticado y verificar propiedad si existe
+    const configId = `config-${session.id}`;
+    if (data.id && data.id !== configId) {
       const existing = await db.query<{ user_id?: string }>(
         'SELECT user_id FROM configuracion_usuario WHERE id = $1',
         [data.id]
       );
-      if (
-        existing.rows.length > 0 &&
-        session.rol !== 'admin' &&
-        existing.rows[0].user_id &&
-        existing.rows[0].user_id !== session.id
-      ) {
+      if (existing.rows.length > 0 && existing.rows[0].user_id !== session.id) {
         return NextResponse.json(
           { error: 'Acceso denegado: no puedes modificar la configuración de otro usuario.' },
           { status: 403 }

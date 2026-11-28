@@ -25,13 +25,10 @@ export async function GET() {
     }
 
     const db = getDb();
-    const query =
-      session.rol === 'admin'
-        ? 'SELECT * FROM deudas ORDER BY saldo_inicial ASC'
-        : 'SELECT * FROM deudas WHERE user_id = $1 ORDER BY saldo_inicial ASC';
-    const params = session.rol === 'admin' ? [] : [session.id];
-
-    const res = await db.query<DeudaRow>(query, params);
+    const res = await db.query<DeudaRow>(
+      'SELECT * FROM deudas WHERE user_id = $1 ORDER BY saldo_inicial ASC',
+      [session.id]
+    );
     const deudas: Deuda[] = res.rows.map((row) => ({
       id: row.id,
       user_id: row.user_id,
@@ -45,7 +42,9 @@ export async function GET() {
       updated_at: row.updated_at,
     }));
 
-    return NextResponse.json(deudas);
+    return NextResponse.json(deudas, {
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
+    });
   } catch (error) {
     console.error('Error fetching deudas from DB:', error);
     return NextResponse.json({ error: 'Error al consultar deudas' }, { status: 500 });
@@ -128,11 +127,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Deuda no encontrada' }, { status: 404 });
     }
 
-    if (
-      session.rol !== 'admin' &&
-      existing.rows[0].user_id &&
-      existing.rows[0].user_id !== session.id
-    ) {
+    if (existing.rows[0].user_id !== session.id) {
       return NextResponse.json(
         { error: 'Acceso denegado: no tienes permiso para modificar este recurso.' },
         { status: 403 }
@@ -191,11 +186,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Deuda no encontrada' }, { status: 404 });
     }
 
-    if (
-      session.rol !== 'admin' &&
-      existing.rows[0].user_id &&
-      existing.rows[0].user_id !== session.id
-    ) {
+    if (existing.rows[0].user_id !== session.id) {
       return NextResponse.json(
         { error: 'Acceso denegado: no tienes permiso para eliminar este recurso.' },
         { status: 403 }

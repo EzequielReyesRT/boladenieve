@@ -53,14 +53,22 @@ interface SnowballContextType {
 
 const SnowballContext = createContext<SnowballContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEYS = {
-  CONFIG: 'snowball_config_v1',
-  DEUDAS: 'snowball_deudas_v1',
-  BITACORA: 'snowball_bitacora_v1',
-};
+const LEGACY_STORAGE_KEYS = [
+  'snowball_config_v1',
+  'snowball_deudas_v1',
+  'snowball_bitacora_v1',
+];
+
+function getUserStorageKeys(userId: string) {
+  return {
+    CONFIG: `snowball_config_v2_${userId}`,
+    DEUDAS: `snowball_deudas_v2_${userId}`,
+    BITACORA: `snowball_bitacora_v2_${userId}`,
+  };
+}
 
 export function SnowballProvider({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [config, setConfig] = useState<ConfiguracionUsuario>(CONFIG_INICIAL);
   const [deudas, setDeudas] = useState<Deuda[]>(DEUDAS_INICIALES);
   const [bitacora, setBitacora] = useState<BitacoraPago[]>(BITACORA_INICIAL);
@@ -68,32 +76,47 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [connectionType, setConnectionType] = useState<'supabase' | 'local_postgres' | 'local_storage'>('local_postgres');
 
-  // 1. Cargar datos iniciales
+  // 1. Cargar datos iniciales aislados por usuario
   useEffect(() => {
+    let isCancelled = false;
+
     async function loadData() {
       if (isAuthLoading) return;
-      if (!isAuthenticated) {
-        setConfig(CONFIG_INICIAL);
-        setDeudas([]);
-        setBitacora([]);
-        setMovimientosFlujo([]);
+
+      // Limpiar claves globales heredadas para evitar fugas entre usuarios en el mismo navegador
+      if (typeof window !== 'undefined') {
+        LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+      }
+
+      // Reiniciar estado en memoria inmediatamente al cambiar o cerrar sesión
+      setConfig(CONFIG_INICIAL);
+      setDeudas([]);
+      setBitacora([]);
+      setMovimientosFlujo([]);
+
+      if (!isAuthenticated || !user?.id) {
         setIsLoaded(true);
         return;
       }
-      // Prioridad 1: Supabase si están las credenciales
+
+      setIsLoaded(false);
+      const userId = user.id;
+
+      // Prioridad 1: Supabase si están las credenciales (filtrado estrictamente por user_id)
       if (isSupabaseConfigured && supabase) {
         try {
           const [cfgRes, deudasRes, bitacoraRes, flujoRes] = await Promise.all([
-            supabase.from('configuracion_usuario').select('*').limit(1).maybeSingle(),
-            supabase.from('deudas').select('*').order('saldo_inicial', { ascending: true }),
-            supabase.from('bitacora_pagos').select('*').order('fecha_pago', { ascending: false }),
-            supabase.from('movimientos_flujo').select('*').order('fecha', { ascending: false }),
+            supabase.from('configuracion_usuario').select('*').eq('user_id', userId).limit(1).maybeSingle(),
+            supabase.from('deudas').select('*').eq('user_id', userId).order('saldo_inicial', { ascending: true }),
+            supabase.from('bitacora_pagos').select('*').eq('user_id', userId).order('fecha_pago', { ascending: false }),
+            supabase.from('movimientos_flujo').select('*').eq('user_id', userId).order('fecha', { ascending: false }),
           ]);
 
-          if (cfgRes.data) setConfig(cfgRes.data);
-          if (Array.isArray(deudasRes.data)) setDeudas(deudasRes.data);
-          if (Array.isArray(bitacoraRes.data)) setBitacora(bitacoraRes.data);
-          if (Array.isArray(flujoRes.data)) setMovimientosFlujo(flujoRes.data);
+          if (isCancelled) return;
+          setConfig(cfgRes.data ?? CONFIG_INICIAL);
+          setDeudas(Array.isArray(deudasRes.data) ? deudasRes.data : []);
+          setBitacora(Array.isArray(bitacoraRes.data) ? bitacoraRes.data : []);
+          setMovimientosFlujo(Array.isArray(flujoRes.data) ? flujoRes.data : []);
           setConnectionType('supabase');
           setIsLoaded(true);
           return;
@@ -102,14 +125,16 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // Prioridad 2: Base de datos PostgreSQL local via API de desarrollo
+      // Prioridad 2: Base de datos PostgreSQL local via API (sin caché, aislada por cookie de sesión)
       try {
         const [resCfg, resDeudas, resBitacora, resFlujo] = await Promise.all([
-          fetch('/api/config'),
-          fetch('/api/deudas'),
-          fetch('/api/pagos'),
-          fetch('/api/flujo'),
+          fetch('/api/config', { credentials: 'include', cache: 'no-store' }),
+          fetch('/api/deudas', { credentials: 'include', cache: 'no-store' }),
+          fetch('/api/pagos', { credentials: 'include', cache: 'no-store' }),
+          fetch('/api/flujo', { credentials: 'include', cache: 'no-store' }),
         ]);
+
+        if (isCancelled) return;
 
         if (resCfg.ok && resDeudas.ok && resBitacora.ok) {
           const dataCfg = await resCfg.json();
@@ -117,43 +142,53 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
           const dataBitacora = await resBitacora.json();
           const dataFlujo = resFlujo.ok ? await resFlujo.json() : [];
 
-          if (dataCfg) setConfig(dataCfg);
-          if (Array.isArray(dataDeudas)) setDeudas(dataDeudas);
-          if (Array.isArray(dataBitacora)) setBitacora(dataBitacora);
-          if (Array.isArray(dataFlujo)) setMovimientosFlujo(dataFlujo);
+          setConfig(dataCfg ?? CONFIG_INICIAL);
+          setDeudas(Array.isArray(dataDeudas) ? dataDeudas : []);
+          setBitacora(Array.isArray(dataBitacora) ? dataBitacora : []);
+          setMovimientosFlujo(Array.isArray(dataFlujo) ? dataFlujo : []);
 
           setConnectionType('local_postgres');
           setIsLoaded(true);
           return;
         }
       } catch (err) {
-        console.warn('API local no disponible, usando almacenamiento local:', err);
+        console.warn('API local no disponible, usando almacenamiento local por usuario:', err);
       }
 
-      // Prioridad 3: Fallback a LocalStorage o Mock Inicial
-      if (typeof window !== 'undefined') {
-        const savedCfg = localStorage.getItem(LOCAL_STORAGE_KEYS.CONFIG);
-        const savedDeudas = localStorage.getItem(LOCAL_STORAGE_KEYS.DEUDAS);
-        const savedBitacora = localStorage.getItem(LOCAL_STORAGE_KEYS.BITACORA);
+      if (isCancelled) return;
 
-        if (savedCfg) setConfig(JSON.parse(savedCfg));
-        if (savedDeudas) setDeudas(JSON.parse(savedDeudas));
-        if (savedBitacora) setBitacora(JSON.parse(savedBitacora));
+      // Prioridad 3: Fallback a LocalStorage aislado por userId
+      if (typeof window !== 'undefined') {
+        const keys = getUserStorageKeys(userId);
+        const savedCfg = localStorage.getItem(keys.CONFIG);
+        const savedDeudas = localStorage.getItem(keys.DEUDAS);
+        const savedBitacora = localStorage.getItem(keys.BITACORA);
+
+        setConfig(savedCfg ? JSON.parse(savedCfg) : CONFIG_INICIAL);
+        setDeudas(savedDeudas ? JSON.parse(savedDeudas) : []);
+        setBitacora(savedBitacora ? JSON.parse(savedBitacora) : []);
       }
       setConnectionType('local_storage');
       setIsLoaded(true);
     }
 
     loadData();
-  }, [isAuthenticated, isAuthLoading]);
 
-  // 2. Guardar en LocalStorage como respaldo adicional
+    return () => {
+      isCancelled = true;
+    };
+  }, [user?.id, isAuthenticated, isAuthLoading]);
+
+  // 2. Guardar en LocalStorage solo en modo local_storage y aislado por userId
   useEffect(() => {
-    if (!isLoaded || typeof window === 'undefined') return;
-    localStorage.setItem(LOCAL_STORAGE_KEYS.CONFIG, JSON.stringify(config));
-    localStorage.setItem(LOCAL_STORAGE_KEYS.DEUDAS, JSON.stringify(deudas));
-    localStorage.setItem(LOCAL_STORAGE_KEYS.BITACORA, JSON.stringify(bitacora));
-  }, [config, deudas, bitacora, isLoaded]);
+    if (!isLoaded || !isAuthenticated || !user?.id || connectionType !== 'local_storage' || typeof window === 'undefined') {
+      return;
+    }
+    const keys = getUserStorageKeys(user.id);
+    localStorage.setItem(keys.CONFIG, JSON.stringify(config));
+    localStorage.setItem(keys.DEUDAS, JSON.stringify(deudas));
+    localStorage.setItem(keys.BITACORA, JSON.stringify(bitacora));
+  }, [config, deudas, bitacora, isLoaded, isAuthenticated, user?.id, connectionType]);
 
   // 3. Cálculos reactivos con useMemo
   const deudasConSaldo = useMemo(() => {
@@ -247,12 +282,12 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
 
   // 4. Operaciones CRUD con sincronización
   const updateConfig = async (nuevaConfig: Partial<ConfiguracionUsuario>) => {
-    const updated = { ...config, ...nuevaConfig };
+    const updated = { ...config, ...nuevaConfig, ...(user?.id ? { user_id: user.id } : {}) };
     setConfig(updated);
 
-    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase && user?.id) {
       try {
-        await supabase.from('configuracion_usuario').upsert(updated);
+        await supabase.from('configuracion_usuario').upsert({ ...updated, user_id: user.id });
       } catch (e) {
         console.error('Error al guardar config en Supabase:', e);
       }
@@ -260,6 +295,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       try {
         await fetch('/api/config', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updated),
         });
@@ -274,13 +310,14 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     const debtObj: Deuda = {
       ...nuevaDeuda,
       id,
+      ...(user?.id ? { user_id: user.id } : {}),
       created_at: new Date().toISOString(),
     };
     setDeudas((prev) => [...prev, debtObj]);
 
-    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase && user?.id) {
       try {
-        await supabase.from('deudas').insert(debtObj);
+        await supabase.from('deudas').insert({ ...debtObj, user_id: user.id });
       } catch (e) {
         console.error('Error al insertar deuda en Supabase:', e);
       }
@@ -288,6 +325,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       try {
         await fetch('/api/deudas', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(debtObj),
         });
@@ -302,12 +340,13 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       prev.map((d) => (d.id === deudaActualizada.id ? deudaActualizada : d))
     );
 
-    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase && user?.id) {
       try {
         await supabase
           .from('deudas')
           .update(deudaActualizada)
-          .eq('id', deudaActualizada.id);
+          .eq('id', deudaActualizada.id)
+          .eq('user_id', user.id);
       } catch (e) {
         console.error('Error al actualizar deuda en Supabase:', e);
       }
@@ -315,6 +354,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       try {
         await fetch('/api/deudas', {
           method: 'PUT',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(deudaActualizada),
         });
@@ -328,9 +368,9 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     setDeudas((prev) => prev.filter((d) => d.id !== deudaId));
     setBitacora((prev) => prev.filter((p) => p.deuda_id !== deudaId));
 
-    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase && user?.id) {
       try {
-        await supabase.from('deudas').delete().eq('id', deudaId);
+        await supabase.from('deudas').delete().eq('id', deudaId).eq('user_id', user.id);
       } catch (e) {
         console.error('Error al eliminar deuda en Supabase:', e);
       }
@@ -338,6 +378,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       try {
         await fetch(`/api/deudas?id=${deudaId}`, {
           method: 'DELETE',
+          credentials: 'include',
         });
       } catch (e) {
         console.error('Error al eliminar deuda en base local:', e);
@@ -350,6 +391,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     const paymentObj: BitacoraPago = {
       ...nuevoPago,
       id,
+      ...(user?.id ? { user_id: user.id } : {}),
       created_at: new Date().toISOString(),
     };
     setBitacora((prev) => [paymentObj, ...prev]);
@@ -362,6 +404,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     const flujoId = `flujo-pago-${id}`;
     const movFlujo: MovimientoFlujo = {
       id: flujoId,
+      ...(user?.id ? { user_id: user.id } : {}),
       tipo: 'Gasto',
       categoria: 'Pago de Tarjeta / Crédito',
       descripcion: `Abono a ${nombreTarjeta} (${nuevoPago.tipo_pago})`,
@@ -373,10 +416,10 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     };
     setMovimientosFlujo((prev) => [movFlujo, ...prev]);
 
-    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase && user?.id) {
       try {
-        await supabase.from('bitacora_pagos').insert(paymentObj);
-        await supabase.from('movimientos_flujo').insert(movFlujo);
+        await supabase.from('bitacora_pagos').insert({ ...paymentObj, user_id: user.id });
+        await supabase.from('movimientos_flujo').insert({ ...movFlujo, user_id: user.id });
       } catch (e) {
         console.error('Error al registrar pago en Supabase:', e);
       }
@@ -384,6 +427,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       try {
         await fetch('/api/pagos', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(paymentObj),
         });
@@ -400,10 +444,10 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     const flujoId = `flujo-pago-${pagoId}`;
     setMovimientosFlujo((prev) => prev.filter((m) => m.id !== flujoId));
 
-    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase && user?.id) {
       try {
-        await supabase.from('bitacora_pagos').delete().eq('id', pagoId);
-        await supabase.from('movimientos_flujo').delete().eq('id', flujoId);
+        await supabase.from('bitacora_pagos').delete().eq('id', pagoId).eq('user_id', user.id);
+        await supabase.from('movimientos_flujo').delete().eq('id', flujoId).eq('user_id', user.id);
       } catch (e) {
         console.error('Error al eliminar pago en Supabase:', e);
       }
@@ -411,6 +455,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       try {
         await fetch(`/api/pagos?id=${pagoId}`, {
           method: 'DELETE',
+          credentials: 'include',
         });
       } catch (e) {
         console.error('Error al eliminar pago en base local:', e);
@@ -423,14 +468,15 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     const movObj: MovimientoFlujo = {
       ...nuevoMov,
       id,
+      ...(user?.id ? { user_id: user.id } : {}),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
     setMovimientosFlujo((prev) => [movObj, ...prev]);
 
-    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase && user?.id) {
       try {
-        await supabase.from('movimientos_flujo').insert(movObj);
+        await supabase.from('movimientos_flujo').insert({ ...movObj, user_id: user.id });
       } catch (e) {
         console.error('Error al registrar movimiento en Supabase:', e);
       }
@@ -438,6 +484,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       try {
         await fetch('/api/flujo', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(movObj),
         });
@@ -452,12 +499,13 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       prev.map((m) => (m.id === movActualizado.id ? movActualizado : m))
     );
 
-    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase && user?.id) {
       try {
         await supabase
           .from('movimientos_flujo')
           .update(movActualizado)
-          .eq('id', movActualizado.id);
+          .eq('id', movActualizado.id)
+          .eq('user_id', user.id);
       } catch (e) {
         console.error('Error al actualizar movimiento en Supabase:', e);
       }
@@ -465,6 +513,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       try {
         await fetch('/api/flujo', {
           method: 'PUT',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(movActualizado),
         });
@@ -477,9 +526,9 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
   const deleteMovimientoFlujo = async (id: string) => {
     setMovimientosFlujo((prev) => prev.filter((m) => m.id !== id));
 
-    if (connectionType === 'supabase' && isSupabaseConfigured && supabase) {
+    if (connectionType === 'supabase' && isSupabaseConfigured && supabase && user?.id) {
       try {
-        await supabase.from('movimientos_flujo').delete().eq('id', id);
+        await supabase.from('movimientos_flujo').delete().eq('id', id).eq('user_id', user.id);
       } catch (e) {
         console.error('Error al eliminar movimiento en Supabase:', e);
       }
@@ -487,6 +536,7 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
       try {
         await fetch(`/api/flujo?id=${id}`, {
           method: 'DELETE',
+          credentials: 'include',
         });
       } catch (e) {
         console.error('Error al eliminar movimiento en base local:', e);
@@ -498,10 +548,11 @@ export function SnowballProvider({ children }: { children: React.ReactNode }) {
     setConfig(CONFIG_INICIAL);
     setDeudas(DEUDAS_INICIALES);
     setBitacora(BITACORA_INICIAL);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.CONFIG);
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.DEUDAS);
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.BITACORA);
+    if (typeof window !== 'undefined' && user?.id) {
+      const keys = getUserStorageKeys(user.id);
+      localStorage.removeItem(keys.CONFIG);
+      localStorage.removeItem(keys.DEUDAS);
+      localStorage.removeItem(keys.BITACORA);
     }
   };
 
